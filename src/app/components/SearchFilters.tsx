@@ -7,7 +7,7 @@ interface SearchFiltersProps {
   categoryFilter: string;
   setCategoryFilter: (value: string) => void;
   tagFilters: string[];
-  setTagFilters: (value: string[]) => void;
+  setTagFilters: (value: string[] | ((prev: string[]) => string[])) => void;
   sortBy: "name" | "distance";
   setSortBy: (value: "name" | "distance") => void;
   resetFilters: () => void;

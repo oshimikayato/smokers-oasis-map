@@ -40,7 +40,7 @@ interface Photo {
 // windowオブジェクトにmarkersプロパティを追加
 declare global {
   interface Window {
-    markers?: google.maps.Marker[];
+    markers?: any[];
   }
 }
 
@@ -233,7 +233,7 @@ const GoogleMap: React.FC = () => {
     const g = (window as any).google;
     if (!g || !g.maps) return;
 
-    window.markers = [];
+    (window as any).markers = (window as any).markers || [];
     
     filteredSpots.forEach((spot) => {
       const isFavorite = favorites.includes(spot.id);
@@ -275,7 +275,7 @@ const GoogleMap: React.FC = () => {
         if (isFavorite) marker.setAnimation(g.maps.Animation.BOUNCE);
       });
 
-      window.markers.push(marker);
+      (window as any).markers.push(marker);
     });
 
     // 検索結果がある場合は、その範囲に地図を調整

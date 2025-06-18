@@ -8,6 +8,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Vercel用の直接接続URL
 }
 
 model SmokingSpot {
@@ -20,6 +21,9 @@ model SmokingSpot {
   category    String   // "喫煙所" or "飲食店"
   tags        String[] // 例: ["屋内", "分煙", "無料", "Wi-Fiあり"]
   feedbacks   Feedback[]
+  photos      Photo[]  // 写真との関連を追加
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Feedback {
@@ -32,4 +36,15 @@ model Feedback {
   rating        Int?          // 1〜5段階評価
   comment       String?
   reportType    String?       // "閉鎖"や"移動"などの修正種別
+}
+
+model Photo {
+  id          Int          @id @default(autoincrement())
+  spot        SmokingSpot  @relation(fields: [spotId], references: [id])
+  spotId      Int
+  url         String       // 画像のURL
+  caption     String?      // キャプション
+  uploadedBy  String?      // アップロードしたユーザー（将来的にUserモデルと関連付け可能）
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }

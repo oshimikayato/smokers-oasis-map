@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "喫煙所・喫煙可能店舗マップ",
-  description: "現在地周辺の喫煙所や喫煙可能な飲食店をマップで探せます。",
+export const metadata: Metadata = {
+  title: "Smokers Oasis Map",
+  description: "喫煙所・喫煙可能店舗マップ",
 };
 
 export default function RootLayout({

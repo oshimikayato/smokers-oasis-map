@@ -40,7 +40,7 @@ interface Photo {
 // windowオブジェクトにmarkersプロパティを追加
 declare global {
   interface Window {
-    markers?: any[];
+    markers?: google.maps.Marker[];
   }
 }
 

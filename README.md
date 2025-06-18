@@ -34,7 +34,7 @@
 3. **環境変数の設定**
    Vercelのダッシュボードで以下を設定：
    ```
-   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyB6SACZrADRUtEhwz0vg5WrOEAs1mIlSxc
    DATABASE_URL=your_postgresql_database_url
    ```
 

@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import SearchFilters from "./SearchFilters";
+import SpotList from "./SpotList";
 
 // 仮の喫煙所データ型
 interface SmokingSpot {
@@ -78,6 +79,7 @@ const GoogleMap: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"map" | "list">("map");
 
   // お気に入り機能
   const [favorites, setFavorites] = useState<number[]>(() => {
@@ -399,6 +401,20 @@ const GoogleMap: React.FC = () => {
     setSortBy("name");
   };
 
+  const handleSelectSpot = (spot: SmokingSpot) => {
+    setSelectedSpot(spot);
+    // フィードバックと写真を取得
+    fetch(`/api/feedback?spotId=${spot.id}`)
+      .then(res => res.json())
+      .then(data => setFeedbacks(data))
+      .catch(console.error);
+    
+    fetch(`/api/photos?spotId=${spot.id}`)
+      .then(res => res.json())
+      .then(data => setPhotos(data))
+      .catch(console.error);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -408,31 +424,69 @@ const GoogleMap: React.FC = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="space-y-6">
       {/* 検索・フィルター */}
-      <div className="lg:col-span-1">
-        <SearchFilters
-          search={search}
-          setSearch={setSearch}
-          categoryFilter={categoryFilter}
-          setCategoryFilter={setCategoryFilter}
-          tagFilters={tagFilters}
-          setTagFilters={setTagFilters}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          resetFilters={resetFilters}
-          filteredCount={filteredSpots.length}
-          totalCount={allSpots.length}
-          userLocation={userLocation}
-        />
+      <SearchFilters
+        search={search}
+        setSearch={setSearch}
+        categoryFilter={categoryFilter}
+        setCategoryFilter={setCategoryFilter}
+        tagFilters={tagFilters}
+        setTagFilters={setTagFilters}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        resetFilters={resetFilters}
+        filteredCount={filteredSpots.length}
+        totalCount={allSpots.length}
+        userLocation={userLocation}
+      />
+
+      {/* ビューモード切り替え */}
+      <div className="flex justify-center">
+        <div className="flex bg-white rounded-lg p-1 shadow-sm">
+          <button
+            onClick={() => setViewMode("map")}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              viewMode === "map" 
+                ? "bg-blue-600 text-white shadow-sm" 
+                : "text-gray-600 hover:text-gray-800"
+            }`}
+          >
+            <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" />
+            </svg>
+            マップ表示
+          </button>
+          <button
+            onClick={() => setViewMode("list")}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              viewMode === "list" 
+                ? "bg-blue-600 text-white shadow-sm" 
+                : "text-gray-600 hover:text-gray-800"
+            }`}
+          >
+            <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+            リスト表示
+          </button>
+        </div>
       </div>
 
-      {/* マップ */}
-      <div className="lg:col-span-2">
+      {/* メインコンテンツ */}
+      {viewMode === "map" ? (
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div ref={mapRef} className="w-full h-96" />
         </div>
-      </div>
+      ) : (
+        <SpotList
+          spots={filteredSpots}
+          favorites={favorites}
+          onToggleFavorite={toggleFavorite}
+          onSelectSpot={handleSelectSpot}
+          userLocation={userLocation}
+        />
+      )}
 
       {/* スポット詳細モーダル */}
       {selectedSpot && (
@@ -671,7 +725,7 @@ const GoogleMap: React.FC = () => {
                                     fill="currentColor"
                                     viewBox="0 0 20 20"
                                   >
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.77.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                   </svg>
                                 ))}
                               </div>

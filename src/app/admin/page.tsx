@@ -117,8 +117,8 @@ export default function AdminDashboard() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-lg">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">管理者ログイン</h2>
-            <p className="mt-2 text-gray-600">yourbreakspot.com 管理画面</p>
+            <h2 className="text-3xl font-bold text-gray-900">システム管理</h2>
+            <p className="mt-2 text-gray-600">yourbreakspot.com システム設定</p>
           </div>
           
           <form onSubmit={handleLogin} className="space-y-6">
@@ -171,7 +171,7 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">管理者ダッシュボード</h1>
+              <h1 className="text-2xl font-bold text-gray-900">システム設定</h1>
               <p className="text-gray-600">yourbreakspot.com</p>
             </div>
             <div className="flex items-center space-x-4">

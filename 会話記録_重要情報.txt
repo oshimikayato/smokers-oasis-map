@@ -1,0 +1,126 @@
+# Smokers Oasis Map プロジェクト - 会話記録・重要情報
+
+## 📅 作成日: 2024年12月19日
+
+## 🎯 プロジェクト概要
+- **プロジェクト名**: Smokers Oasis Map
+- **技術スタック**: Next.js 15.3.3, TypeScript, Tailwind CSS, Prisma, PostgreSQL
+- **ホスティング**: Vercel
+- **本番URL**: https://yourbreakspot.com/
+- **GitHub**: https://github.com/oshimikayato/smokers-oasis-map
+
+## 🚨 現在の問題（2024年12月19日）
+- **エラー**: Application error: a client-side exception has occurred
+- **URL**: https://yourbreakspot.com/
+- **状況**: Vercelデプロイでクライアントサイドエラー発生
+- **原因**: 環境変数の設定不備の可能性
+
+## 🔧 重要な設定・環境変数
+
+### .env.local ファイル内容（ローカル用）
+```
+# Google Maps API Key
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg
+
+# Database URL (PostgreSQL)
+DATABASE_URL="postgresql://postgres:password@localhost:5432/smokers_oasis"
+
+# JWT Secret
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+
+# Next Auth
+NEXTAUTH_URL=http://localhost:3001
+NEXTAUTH_SECRET=your-nextauth-secret-key-change-this-in-production
+```
+
+### Vercel環境変数設定（本番用）
+**Vercelダッシュボードで以下を設定する必要があります：**
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `NEXTAUTH_URL` (本番URLに変更)
+- `NEXTAUTH_SECRET`
+
+## 📁 プロジェクト構造
+```
+src/app/
+├── components/
+│   ├── GoogleMap.tsx      # メインのマップコンポーネント
+│   ├── Header.tsx         # ヘッダーコンポーネント
+│   ├── SearchFilters.tsx  # 検索・フィルター機能
+│   └── HealthTracker.tsx  # 健康管理機能
+├── page.tsx               # メインページ（タブ切り替え）
+├── layout.tsx             # レイアウト設定
+└── globals.css            # グローバルスタイル
+```
+
+## 🚀 開発サーバー起動
+```bash
+npm run dev
+```
+- 通常ポート3000、使用中の場合3001, 3002, 3003...と自動変更
+- 最新のアクセスURL: http://localhost:3003
+
+## 🔄 Git操作履歴
+
+### 最新のコミット
+- **コミットID**: baf42e0
+- **メッセージ**: "昨日の安定状態にリセット"
+- **状態**: リモートリポジトリに強制プッシュ済み
+
+### 重要なコミット履歴
+- 9d08e61: 健康管理機能を追加
+- e4e107c: 管理者ログインを非表示化（現在の安定状態）
+- 08451f5: 管理者機能追加
+- f5ec9f7: TypeScriptエラー修正
+
+## ⚠️ 注意事項・トラブルシューティング
+
+### PowerShellでの問題
+- `&&` コマンドが使えない（Windows PowerShellの制限）
+- コマンドは個別に実行する必要がある
+
+### ポート競合
+- ポート3000が使用中の場合、自動的に3001, 3002...に変更される
+- 最新のポート番号を確認してからブラウザアクセス
+
+### Vercelデプロイ
+- 変更反映時間: 通常1〜3分
+- デプロイ状況確認: Vercelダッシュボードの「Deployments」タブ
+
+### Vercelクライアントサイドエラー（2024年12月19日）
+- **エラー**: Application error: a client-side exception has occurred
+- **解決方法**: 
+  1. Vercelダッシュボードで環境変数を設定
+  2. 特に `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` が重要
+  3. デプロイログでエラー詳細を確認
+  4. 必要に応じてビルド設定を調整
+
+## 🎯 現在の機能
+1. **喫煙所マップ**: Google Maps APIを使用した地図表示
+2. **検索・フィルター**: カテゴリ、タグ、キーワード検索
+3. **健康管理**: 喫煙記録、禁煙目標、統計機能
+4. **写真投稿**: 喫煙所の写真アップロード機能
+5. **フィードバック**: ユーザーレビュー・報告機能
+
+## 📝 今後の改善点・TODO
+- [ ] Vercel環境変数の設定
+- [ ] 本番環境でのエラーハンドリング強化
+- [ ] UI/UXの改善
+- [ ] パフォーマンス最適化
+- [ ] テストの追加
+
+## 🔗 重要なURL
+- **ローカル開発**: http://localhost:3003
+- **Vercel本番**: https://yourbreakspot.com/ (現在エラー中)
+- **GitHub**: https://github.com/oshimikayato/smokers-oasis-map
+
+## 📞 サポート情報
+- 問題発生時は、このファイルの内容を参照
+- エラーメッセージは必ず記録する
+- 設定変更時はこのファイルも更新する
+- Vercelデプロイエラー時は環境変数を確認
+
+---
+最終更新: 2024年12月19日 (Vercelエラー情報追加)
+更新者: AI Assistant 

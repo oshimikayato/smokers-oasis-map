@@ -255,7 +255,9 @@ const GoogleMap: React.FC = () => {
         infoWindow.open(map, marker);
       });
 
-      window.markers.push(marker);
+      if (window.markers) {
+        window.markers.push(marker);
+      }
     });
   }, [map, filteredSpots]);
 
@@ -279,7 +281,7 @@ const GoogleMap: React.FC = () => {
     };
   }, [filteredSpots]);
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFeedbackForm({ ...feedbackForm, [e.target.name]: e.target.value });
   };
 
@@ -419,8 +421,9 @@ const GoogleMap: React.FC = () => {
           sortBy={sortBy}
           setSortBy={setSortBy}
           resetFilters={resetFilters}
-          categoryOptions={CATEGORY_OPTIONS}
-          tagOptions={TAG_OPTIONS}
+          filteredCount={filteredSpots.length}
+          totalCount={allSpots.length}
+          userLocation={userLocation}
         />
       </div>
 

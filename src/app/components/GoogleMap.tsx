@@ -89,29 +89,38 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 
   // mapRefの変更を監視してmapElementを更新
   useEffect(() => {
+    console.log('mapRef useEffect triggered', { mapRef: mapRef.current });
     if (mapRef.current) {
+      console.log('Setting mapElement to:', mapRef.current);
       setMapElement(mapRef.current);
     }
   }, [mapRef.current]);
 
   // Google Maps APIの読み込み
   useEffect(() => {
+    console.log('Google Maps API loading useEffect triggered');
     const loadGoogleMapsAPI = () => {
       if (window.google && window.google.maps) {
+        console.log('Google Maps API already loaded');
         return; // 既にロード済み
       }
 
       // Google Maps APIが既にロードされているかチェック
       const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
       if (existingScript) {
+        console.log('Google Maps API script already exists');
         return; // 既にロード中またはロード済み
       }
 
+      console.log('Loading Google Maps API...');
       // 新しいスクリプトをロード
       const script = document.createElement("script");
       script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env['NEXT_PUBLIC_GOOGLE_MAPS_API_KEY'] || ''}&libraries=places`;
       script.async = true;
       script.defer = true;
+      script.onload = () => {
+        console.log('Google Maps API script loaded successfully');
+      };
       script.onerror = () => {
         console.error('Google Maps APIの読み込みに失敗しました');
       };
@@ -125,11 +134,22 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 
   // マップの初期化（Google Maps APIとmapElementが利用可能になったら実行）
   useEffect(() => {
+    console.log('Map initialization useEffect triggered', { 
+      google: !!window.google, 
+      googleMaps: !!(window.google && window.google.maps), 
+      mapElement: !!mapElement 
+    });
+    
     const checkAndInitialize = () => {
       if (window.google && window.google.maps && mapElement) {
         console.log('Initializing map - both Google Maps API and mapElement are available');
         initializeMap();
       } else {
+        console.log('Waiting for dependencies:', { 
+          google: !!window.google, 
+          googleMaps: !!(window.google && window.google.maps), 
+          mapElement: !!mapElement 
+        });
         // まだ準備ができていない場合は少し待ってから再試行
         setTimeout(checkAndInitialize, 100);
       }

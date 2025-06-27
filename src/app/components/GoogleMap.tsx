@@ -5,7 +5,7 @@ import SpotList from "./SpotList";
 import LoadingSkeleton from "./LoadingSkeleton";
 import ErrorMessage from "./ErrorMessage";
 import { useSpots } from "@/hooks/useSpots";
-import { SmokingSpot, Feedback, FeedbackForm, PhotoForm, ViewMode } from "@/types";
+import { SmokingSpot, Feedback, FeedbackForm, PhotoForm } from "@/types";
 
 // Google Maps APIの型定義
 declare global {
@@ -34,7 +34,6 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   const [map, setMap] = useState<any>(null);
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [photoForm, setPhotoForm] = useState<PhotoForm>({ url: "", caption: "" });
-  const [viewMode, setViewMode] = useState<ViewMode>("map");
 
   // カスタムフックを使用
   const {

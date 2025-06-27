@@ -7,7 +7,7 @@ import { SmokingSpotWithDistance } from '../../types';
 import { useHistory } from '@/contexts/HistoryContext';
 
 const HistoryPage: React.FC = () => {
-  const { history, clearHistory, removeFromHistory } = useHistory();
+  const { history, clearHistory } = useHistory();
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedSpot, setSelectedSpot] = useState<SmokingSpotWithDistance | null>(null);
   const [isLoading, setIsLoading] = useState(false);

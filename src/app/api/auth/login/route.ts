@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { sign } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const ADMIN_USERNAME = process.env['ADMIN_USERNAME'] || 'admin';
+const ADMIN_PASSWORD = process.env['ADMIN_PASSWORD'] || 'admin123';
+const JWT_SECRET = process.env['JWT_SECRET'] || 'your-secret-key';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     // 管理者認証
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       // JWTトークンを生成
-      const token = sign(
+      const token = jwt.sign(
         { username, role: 'admin' },
         JWT_SECRET,
         { expiresIn: '24h' }

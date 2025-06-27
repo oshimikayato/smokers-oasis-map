@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import SearchFilters from "./components/SearchFilters";
+import Image from 'next/image';
 
 // 仮の喫煙所データ型
 interface SmokingSpot {
@@ -44,8 +45,7 @@ declare global {
   }
 }
 
-const CATEGORY_OPTIONS = ["喫煙所", "飲食店"];
-const TAG_OPTIONS = ["屋内", "屋外", "全席喫煙可", "分煙", "無料", "有料", "電源あり", "Wi-Fiあり"];
+// CATEGORY_OPTIONS, TAG_OPTIONSを削除
 
 // 距離計算関数（ハバーサイン公式）
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -633,9 +633,11 @@ const GoogleMap: React.FC = () => {
               <div className="photo-gallery">
                 {photos.map(photo => (
                   <div key={photo.id} className="photo-item">
-                    <img
+                    <Image
                       src={photo.url}
                       alt={photo.caption || "喫煙所の写真"}
+                      width={300}
+                      height={128}
                       className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
                       onClick={() => window.open(photo.url, '_blank')}
                     />

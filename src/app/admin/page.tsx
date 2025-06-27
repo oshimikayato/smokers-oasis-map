@@ -1,50 +1,37 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+
+interface Spot {
+  id: number;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  category: string;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface AdminStats {
   totalSpots: number;
   totalFeedbacks: number;
   totalPhotos: number;
-  recentSpots: any[];
+  recentSpots: Spot[];
   recentFeedbacks: any[];
 }
 
 export default function AdminDashboard() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<AdminStats | null>(null);
-  const [showLogin, setShowLogin] = useState(false);
   const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const [loginError, setLoginError] = useState('');
   const router = useRouter();
 
-  // 認証状態をチェック
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const response = await fetch('/api/auth/verify');
-      const data = await response.json();
-      
-      if (data.authenticated) {
-        setIsAuthenticated(true);
-        loadStats();
-      } else {
-        setShowLogin(true);
-      }
-    } catch (error) {
-      console.error('Auth check error:', error);
-      setShowLogin(true);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     try {
       const [spotsRes, feedbacksRes, photosRes] = await Promise.all([
         fetch('/api/spots'),
@@ -66,7 +53,30 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Stats load error:', error);
     }
-  };
+  }, []);
+
+  const checkAuth = useCallback(async () => {
+    try {
+      const response = await fetch('/api/auth/verify');
+      const data = await response.json();
+      
+      if (data.authenticated) {
+        loadStats();
+      } else {
+        setShowLogin(true);
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+      setShowLogin(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [loadStats]);
+
+  // 認証状態をチェック
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,8 +92,6 @@ export default function AdminDashboard() {
       const data = await response.json();
 
       if (data.success) {
-        setIsAuthenticated(true);
-        setShowLogin(false);
         loadStats();
       } else {
         setLoginError(data.message);
@@ -96,8 +104,6 @@ export default function AdminDashboard() {
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-      setIsAuthenticated(false);
-      setShowLogin(true);
       setStats(null);
     } catch (error) {
       console.error('Logout error:', error);

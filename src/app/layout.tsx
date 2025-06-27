@@ -14,8 +14,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Smokers Oasis Map",
-  description: "喫煙所・喫煙可能店舗マップ",
+  title: "Smokers Oasis - 喫煙所・喫煙可能店舗マップ",
+  description: "近くの喫煙所や喫煙可能な飲食店を簡単に見つけられるマップアプリ",
+  keywords: "喫煙所, 喫煙, マップ, 飲食店, 分煙",
+  authors: [{ name: "Smokers Oasis Team" }],
+  viewport: "width=device-width, initial-scale=1",
+  robots: "index, follow",
+  openGraph: {
+    title: "Smokers Oasis - 喫煙所・喫煙可能店舗マップ",
+    description: "近くの喫煙所や喫煙可能な飲食店を簡単に見つけられるマップアプリ",
+    type: "website",
+    locale: "ja_JP",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Smokers Oasis - 喫煙所・喫煙可能店舗マップ",
+    description: "近くの喫煙所や喫煙可能な飲食店を簡単に見つけられるマップアプリ",
+  },
 };
 
 export default function RootLayout({
@@ -23,19 +38,30 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const googleMapsApiKey = process.env['NEXT_PUBLIC_GOOGLE_MAPS_API_KEY'];
+  
   return (
-    <html lang="en">
+    <html lang="ja">
       <head>
-        <Script
-          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
-          strategy="beforeInteractive"
-        />
+        {googleMapsApiKey && (
+          <Script
+            src={`https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}`}
+            strategy="beforeInteractive"
+          />
+        )}
         <link rel="icon" type="image/png" href="/favicon.png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        {/* スキップリンク - アクセシビリティ向上 */}
+        <a href="#main-content" className="skip-link">
+          メインコンテンツにスキップ
+        </a>
+        
+        <div id="main-content">
+          {children}
+        </div>
       </body>
     </html>
   );

@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -18,7 +18,7 @@ model SmokingSpot {
   address     String?
   description String?
   category    String   // "喫煙所" or "飲食店"
-  tags        String[] // 例: ["屋内", "分煙", "無料", "Wi-Fiあり"]
+  tags        String   // カンマ区切りで保存: "屋内,分煙,無料,Wi-Fiあり"
   feedbacks   Feedback[]
   photos      Photo[]  // 写真との関連を追加
   createdAt   DateTime @default(now())
@@ -46,4 +46,58 @@ model Photo {
   uploadedBy  String?      // アップロードしたユーザー（将来的にUserモデルと関連付け可能）
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+}
+
+// 禁煙チャレンジ機能用のモデル
+model QuitSmokingChallenge {
+  id              Int       @id @default(autoincrement())
+  userId          String    // ユーザーID（将来的にUserモデルと関連付け可能）
+  startDate       DateTime  @default(now())
+  targetDate      DateTime? // 目標日（任意）
+  isActive        Boolean   @default(true)
+  motivation      String?   // 禁煙の動機
+  dailyGoal       String?   // 日々の目標
+  achievements    Achievement[]
+  milestones      Milestone[]
+  dailyChecks     DailyCheck[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Achievement {
+  id              Int       @id @default(autoincrement())
+  challengeId     Int
+  challenge       QuitSmokingChallenge @relation(fields: [challengeId], references: [id])
+  type            String    // "daily_check", "milestone", "streak", "savings"
+  title           String
+  description     String?
+  value           Float?    // 達成値（節約金額、日数など）
+  achievedAt      DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+}
+
+model Milestone {
+  id              Int       @id @default(autoincrement())
+  challengeId     Int
+  challenge       QuitSmokingChallenge @relation(fields: [challengeId], references: [id])
+  title           String
+  description     String?
+  targetDays      Int       // 目標日数
+  isAchieved      Boolean   @default(false)
+  achievedAt      DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+model DailyCheck {
+  id              Int       @id @default(autoincrement())
+  challengeId     Int
+  challenge       QuitSmokingChallenge @relation(fields: [challengeId], references: [id])
+  date            DateTime  @default(now())
+  isSmokeFree     Boolean   @default(true)
+  mood            String?   // "great", "good", "okay", "bad", "terrible"
+  notes           String?   // その日のメモ
+  cravings        Int?      // 喫煙欲求の強さ（1-10）
+  triggers        String?   // カンマ区切りで保存: "ストレス,飲酒,コーヒー"
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }

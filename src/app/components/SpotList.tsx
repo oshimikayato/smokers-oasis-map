@@ -40,8 +40,15 @@ const SpotList: React.FC<SpotListProps> = ({
     return category === "喫煙所" ? "🚬" : "🍽️";
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent, spot: SmokingSpot) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSelectSpot(spot);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden" role="region" aria-label="喫煙所リスト">
       <div className="p-4 border-b border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900">
           📍 スポット一覧 ({spots.length}件)
@@ -53,26 +60,31 @@ const SpotList: React.FC<SpotListProps> = ({
         )}
       </div>
       
-      <div className="max-h-96 overflow-y-auto">
+      <div className="max-h-96 overflow-y-auto" role="listbox" aria-label="喫煙所の一覧">
         {spots.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">
-            <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="p-6 text-center text-gray-500" role="status" aria-live="polite">
+            <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <p>条件に一致するスポットが見つかりません</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-200">
-            {spots.map((spot) => (
+            {spots.map((spot, index) => (
               <div
                 key={spot.id}
-                className="p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                className="p-4 hover:bg-gray-50 transition-colors cursor-pointer focus:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onClick={() => onSelectSpot(spot)}
+                onKeyDown={(e) => handleKeyDown(e, spot)}
+                tabIndex={0}
+                role="option"
+                aria-selected="false"
+                aria-label={`${spot.name}、${spot.category}、${spot.address || '住所不明'}`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg">{getCategoryIcon(spot.category)}</span>
+                      <span className="text-lg" aria-hidden="true">{getCategoryIcon(spot.category)}</span>
                       <h4 className="text-sm font-medium text-gray-900 truncate">
                         {spot.name}
                       </h4>
@@ -83,13 +95,13 @@ const SpotList: React.FC<SpotListProps> = ({
                     
                     {spot.address && (
                       <p className="text-xs text-gray-600 mb-2 truncate">
-                        📍 {spot.address}
+                        <span aria-hidden="true">📍</span> {spot.address}
                       </p>
                     )}
                     
                     {spot.distance && userLocation && (
                       <p className="text-xs text-blue-600 font-medium mb-2">
-                        📏 {formatDistance(spot.distance)}
+                        <span aria-hidden="true">📏</span> {formatDistance(spot.distance)}
                       </p>
                     )}
                     
@@ -99,7 +111,7 @@ const SpotList: React.FC<SpotListProps> = ({
                       </p>
                     )}
                     
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1" role="group" aria-label="タグ">
                       {spot.tags.slice(0, 3).map((tag) => (
                         <span
                           key={tag}
@@ -121,17 +133,26 @@ const SpotList: React.FC<SpotListProps> = ({
                       e.stopPropagation();
                       onToggleFavorite(spot.id);
                     }}
-                    className={`ml-3 p-2 rounded-full transition-colors ${
+                    onKeyDown={(e) => {
+                      e.stopPropagation();
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onToggleFavorite(spot.id);
+                      }
+                    }}
+                    className={`ml-3 p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 ${
                       favorites.includes(spot.id)
                         ? 'text-red-500 hover:text-red-600'
                         : 'text-gray-400 hover:text-gray-600'
                     }`}
+                    aria-label={favorites.includes(spot.id) ? `${spot.name}をお気に入りから削除` : `${spot.name}をお気に入りに追加`}
                   >
                     <svg
                       className="w-5 h-5"
                       fill={favorites.includes(spot.id) ? "currentColor" : "none"}
                       stroke="currentColor"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
                       <path
                         strokeLinecap="round"

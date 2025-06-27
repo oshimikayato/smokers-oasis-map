@@ -1,0 +1,101 @@
+# Gemini デバッグ依頼
+
+## 問題の詳細
+Google Mapsが表示されない問題が継続しています。
+
+### 現在の状況
+- Google Maps API: 正常にロード済み (google: true, googleMaps: true)
+- mapElement: 常にfalseのまま
+- マップコンテナのrefが正しく設定されていない
+
+### 現在のコード
+```typescript
+const mapRef = useRef<HTMLDivElement>(null);
+const [mapElement, setMapElement] = useState<HTMLDivElement | null>(null);
+const [isMapContainerReady, setIsMapContainerReady] = useState(false);
+
+// mapRefの変更を監視してmapElementを更新
+useLayoutEffect(() => {
+  console.log('mapRef useLayoutEffect triggered', { mapRef: mapRef.current });
+  
+  // DOM要素の存在確認
+  const mapContainer = document.getElementById('google-map-container');
+  console.log('DOM element check:', { 
+    mapContainer: !!mapContainer, 
+    mapRef: !!mapRef.current,
+    mapRefCurrent: mapRef.current 
+  });
+  
+  const checkAndSetMapElement = () => {
+    if (mapRef.current) {
+      console.log('Setting mapElement to:', mapRef.current);
+      setMapElement(mapRef.current);
+      setIsMapContainerReady(true);
+      return true;
+    }
+    return false;
+  };
+
+  // 最初のチェック
+  if (!checkAndSetMapElement()) {
+    console.log('mapRef.current is null, retrying...');
+    // mapRefがnullの場合は少し待ってから再試行
+    const timer = setTimeout(() => {
+      if (!checkAndSetMapElement()) {
+        console.log('mapRef.current is still null after retry');
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }
+  
+  return undefined; // 明示的にundefinedを返す
+}, []); // 依存配列を空にする - mapRefは可変値なので含めない
+
+// JSX
+<div className="lg:col-span-2">
+  <div className="bg-white rounded-lg shadow-md p-4 relative">
+    <div 
+      ref={mapRef} 
+      id="google-map-container"
+      className="w-full h-96 rounded-lg" 
+      style={{ minHeight: '384px' }}
+    />
+    {!isMapContainerReady && (
+      <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
+        <p className="text-gray-500">マップを読み込み中...</p>
+      </div>
+    )}
+    {/* デバッグ情報 */}
+    <div className="mt-2 text-xs text-gray-500">
+      mapRef: {mapRef.current ? 'available' : 'null'}, 
+      mapElement: {mapElement ? 'set' : 'null'}, 
+      isReady: {isMapContainerReady ? 'true' : 'false'}
+    </div>
+  </div>
+</div>
+```
+
+### デバッグログ
+- "mapRef useLayoutEffect triggered" は表示される
+- "DOM element check:" で mapRef: false が表示される
+- "mapRef.current is null, retrying..." が表示される
+- "mapRef.current is still null after retry" が表示される
+
+### 試した修正
+1. useEffect → useLayoutEffect に変更
+2. 依存配列からmapRefを削除
+3. デバッグ情報を追加
+4. タイマーでの再試行を追加
+
+### 質問
+1. なぜmapRef.currentが常にnullのままなのでしょうか？
+2. useLayoutEffectでも解決しない理由は何でしょうか？
+3. Next.jsのSSR/CSRが関係している可能性はありますか？
+4. より確実にDOM要素を取得する方法はありますか？
+5. 根本的な解決策を提案してください。
+
+### 環境
+- Next.js 15.3.3
+- React 18
+- TypeScript
+- Vercelデプロイ 

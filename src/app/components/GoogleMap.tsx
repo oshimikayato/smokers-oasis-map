@@ -88,9 +88,19 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     }
   }, [onSpotSelect]);
 
+  // refの設定を確実にするためのコールバック
+  const setMapRef = useCallback((node: HTMLDivElement | null) => {
+    console.log('setMapRef called with:', node);
+    if (node) {
+      console.log('Setting mapElement to:', node);
+      setMapElement(node);
+      setIsMapContainerReady(true);
+    }
+  }, []);
+
   // mapRefの変更を監視してmapElementを更新
-  useLayoutEffect(() => {
-    console.log('mapRef useLayoutEffect triggered', { mapRef: mapRef.current });
+  useEffect(() => {
+    console.log('mapRef useEffect triggered', { mapRef: mapRef.current });
     
     // DOM要素の存在確認
     const mapContainer = document.getElementById('google-map-container');
@@ -124,6 +134,15 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     
     return undefined; // 明示的にundefinedを返す
   }, []); // 依存配列を空にする - mapRefは可変値なので含めない
+
+  // 追加: mapRefの変更を監視するuseEffect
+  useEffect(() => {
+    if (mapRef.current && !mapElement) {
+      console.log('mapRef changed, setting mapElement');
+      setMapElement(mapRef.current);
+      setIsMapContainerReady(true);
+    }
+  }, [mapRef.current, mapElement]);
 
   // Google Maps APIの読み込み
   useEffect(() => {
@@ -411,7 +430,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-md p-4 relative">
             <div 
-              ref={mapRef} 
+              ref={setMapRef} 
               id="google-map-container"
               className="w-full h-96 rounded-lg" 
               style={{ minHeight: '384px' }}

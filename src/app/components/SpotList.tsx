@@ -1,17 +1,6 @@
 "use client";
 import React from 'react';
-
-interface SmokingSpot {
-  id: number;
-  name: string;
-  lat: number;
-  lng: number;
-  address?: string;
-  description?: string;
-  category: string;
-  tags: string[];
-  distance?: number;
-}
+import { SmokingSpot } from '@/types';
 
 interface SpotListProps {
   spots: SmokingSpot[];
@@ -112,17 +101,17 @@ const SpotList: React.FC<SpotListProps> = ({
                     )}
                     
                     <div className="flex flex-wrap gap-1" role="group" aria-label="タグ">
-                      {spot.tags.slice(0, 3).map((tag) => (
+                      {typeof spot.tags === 'string' && spot.tags.split(',').slice(0, 3).map((tag, tagIndex) => (
                         <span
-                          key={tag}
+                          key={tagIndex}
                           className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"
                         >
-                          {tag}
+                          {tag.trim()}
                         </span>
                       ))}
-                      {spot.tags.length > 3 && (
+                      {typeof spot.tags === 'string' && spot.tags.split(',').length > 3 && (
                         <span className="text-xs text-gray-500">
-                          +{spot.tags.length - 3}
+                          +{spot.tags.split(',').length - 3}
                         </span>
                       )}
                     </div>

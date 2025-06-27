@@ -15,7 +15,19 @@ declare global {
   }
 }
 
-const GoogleMap: React.FC = () => {
+interface GoogleMapProps {
+  showSearchFilters?: boolean;
+  showSpotList?: boolean;
+  onSpotSelect?: (spot: SmokingSpot) => void;
+  selectedSpot?: SmokingSpot | null;
+}
+
+const GoogleMap: React.FC<GoogleMapProps> = ({
+  showSearchFilters = true,
+  showSpotList = false,
+  onSpotSelect,
+  selectedSpot: externalSelectedSpot
+}) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [selectedSpot, setSelectedSpot] = useState<SmokingSpot | null>(null);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
@@ -69,6 +81,14 @@ const GoogleMap: React.FC = () => {
   const toggleFavorite = useCallback((spotId: number) => {
     setFavorites(favs => favs.includes(spotId) ? favs.filter(id => id !== spotId) : [...favs, spotId]);
   }, []);
+
+  // スポット選択ハンドラー
+  const handleSpotSelect = useCallback((spot: SmokingSpot) => {
+    setSelectedSpot(spot);
+    if (onSpotSelect) {
+      onSpotSelect(spot);
+    }
+  }, [onSpotSelect]);
 
   // Google Maps APIの読み込みと初期化
   useEffect(() => {
@@ -136,14 +156,14 @@ const GoogleMap: React.FC = () => {
       });
 
       marker.addListener("click", () => {
-        setSelectedSpot(spot);
+        handleSpotSelect(spot);
       });
 
       if (window.markers) {
         window.markers.push(marker);
       }
     });
-  }, [filteredSpots, userLocation]);
+  }, [filteredSpots, userLocation, handleSpotSelect]);
 
   // マップ更新
   useEffect(() => {
@@ -252,7 +272,7 @@ const GoogleMap: React.FC = () => {
 
   // スポット選択
   const handleSelectSpot = (spot: SmokingSpot) => {
-    setSelectedSpot(spot);
+    handleSpotSelect(spot);
     if (map) {
       map.setCenter({ lat: spot.lat, lng: spot.lng });
       map.setZoom(16);
@@ -263,18 +283,20 @@ const GoogleMap: React.FC = () => {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <SearchFilters
-          search={search}
-          setSearch={setSearch}
-          categoryFilter={categoryFilter}
-          setCategoryFilter={setCategoryFilter}
-          tagFilters={tagFilters}
-          setTagFilters={setTagFilters}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          resetFilters={resetFilters}
-          userLocation={userLocation}
-        />
+        {showSearchFilters && (
+          <SearchFilters
+            search={search}
+            setSearch={setSearch}
+            categoryFilter={categoryFilter}
+            setCategoryFilter={setCategoryFilter}
+            tagFilters={tagFilters}
+            setTagFilters={setTagFilters}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            resetFilters={resetFilters}
+            userLocation={userLocation}
+          />
+        )}
         <LoadingSkeleton type="map" />
       </div>
     );
@@ -284,18 +306,20 @@ const GoogleMap: React.FC = () => {
   if (error) {
     return (
       <div className="space-y-6">
-        <SearchFilters
-          search={search}
-          setSearch={setSearch}
-          categoryFilter={categoryFilter}
-          setCategoryFilter={setCategoryFilter}
-          tagFilters={tagFilters}
-          setTagFilters={setTagFilters}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          resetFilters={resetFilters}
-          userLocation={userLocation}
-        />
+        {showSearchFilters && (
+          <SearchFilters
+            search={search}
+            setSearch={setSearch}
+            categoryFilter={categoryFilter}
+            setCategoryFilter={setCategoryFilter}
+            tagFilters={tagFilters}
+            setTagFilters={setTagFilters}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            resetFilters={resetFilters}
+            userLocation={userLocation}
+          />
+        )}
         <ErrorMessage 
           message={error} 
           onRetry={() => {
@@ -310,18 +334,20 @@ const GoogleMap: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* 検索・フィルター */}
-      <SearchFilters
-        search={search}
-        setSearch={setSearch}
-        categoryFilter={categoryFilter}
-        setCategoryFilter={setCategoryFilter}
-        tagFilters={tagFilters}
-        setTagFilters={setTagFilters}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
-        resetFilters={resetFilters}
-        userLocation={userLocation}
-      />
+      {showSearchFilters && (
+        <SearchFilters
+          search={search}
+          setSearch={setSearch}
+          categoryFilter={categoryFilter}
+          setCategoryFilter={setCategoryFilter}
+          tagFilters={tagFilters}
+          setTagFilters={setTagFilters}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          resetFilters={resetFilters}
+          userLocation={userLocation}
+        />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* マップ */}
@@ -332,16 +358,18 @@ const GoogleMap: React.FC = () => {
         </div>
 
         {/* スポットリスト */}
-        <div className="lg:col-span-1">
-          <SpotList
-            spots={filteredSpots}
-            onSpotSelect={handleSelectSpot}
-            selectedSpot={selectedSpot}
-            favorites={favorites}
-            toggleFavorite={toggleFavorite}
-            userLocation={userLocation}
-          />
-        </div>
+        {showSpotList && (
+          <div className="lg:col-span-1">
+            <SpotList
+              spots={filteredSpots}
+              onSpotSelect={handleSelectSpot}
+              selectedSpot={selectedSpot}
+              favorites={favorites}
+              toggleFavorite={toggleFavorite}
+              userLocation={userLocation}
+            />
+          </div>
+        )}
       </div>
 
       {/* スポット詳細モーダル */}
@@ -368,7 +396,7 @@ const GoogleMap: React.FC = () => {
                 <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
                   {selectedSpot.category}
                 </span>
-                {selectedSpot.tags.split(',').map((tag: string, index: number) => (
+                {typeof selectedSpot.tags === 'string' && selectedSpot.tags.split(',').filter((tag: string) => tag.trim()).map((tag: string, index: number) => (
                   <span key={index} className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm">
                     {tag.trim()}
                   </span>

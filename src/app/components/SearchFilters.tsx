@@ -69,11 +69,11 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   const hasActiveFilters = categoryFilter || tagFilters.length > 0 || search;
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
+    <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl border border-white/30 p-8 space-y-8">
       {/* 検索バー */}
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
@@ -84,17 +84,17 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           onChange={e => setSearch(e.target.value)}
           onFocus={() => setIsSearchFocused(true)}
           onBlur={() => setIsSearchFocused(false)}
-          className={`w-full pl-10 pr-12 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-            isSearchFocused ? 'border-blue-500' : 'border-gray-300'
+          className={`w-full pl-12 pr-12 py-4 border-2 rounded-2xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-500/20 text-lg ${
+            isSearchFocused ? 'border-blue-500 bg-blue-50/50' : 'border-gray-200 bg-white/50'
           }`}
         />
         {search && (
           <button
             onClick={() => setSearch("")}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="検索をクリア"
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -102,13 +102,13 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       </div>
 
       {/* フィルターオプション */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {/* カテゴリとソート */}
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-4">
           <select 
             value={categoryFilter} 
             onChange={e => setCategoryFilter(e.target.value)} 
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            className="px-6 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-white/50 text-lg font-medium"
           >
             {CATEGORY_OPTIONS.map(opt => (
               <option key={opt.value} value={opt.value}>
@@ -120,7 +120,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           <select 
             value={sortBy} 
             onChange={e => setSortBy(e.target.value as "name" | "distance")} 
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            className="px-6 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-white/50 text-lg font-medium"
           >
             <option value="name">📝 名前順</option>
             <option value="distance" disabled={!userLocation}>
@@ -131,9 +131,9 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           {hasActiveFilters && (
             <button
               onClick={resetFilters}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center"
+              className="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-2xl hover:from-gray-200 hover:to-gray-300 transition-all duration-300 flex items-center gap-2 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
               リセット
@@ -143,19 +143,22 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 
         {/* タグフィルター */}
         <div>
-          <h3 className="text-sm font-medium text-gray-700 mb-3">🏷️ タグで絞り込み</h3>
-          <div className="flex flex-wrap gap-2">
+          <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <span className="text-2xl">🏷️</span>
+            タグで絞り込み
+          </h3>
+          <div className="flex flex-wrap gap-3">
             {TAG_OPTIONS.map(tag => (
               <button
                 key={tag.value}
                 onClick={() => handleTagToggle(tag.value)}
-                className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${
                   tagFilters.includes(tag.value)
-                    ? `bg-${tag.color}-100 text-${tag.color}-800 ring-2 ring-${tag.color}-300`
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? `bg-gradient-to-r from-${tag.color}-500 to-${tag.color}-600 text-white shadow-lg`
+                    : 'bg-white/50 text-gray-700 hover:bg-white border-2 border-gray-200 hover:border-gray-300'
                 }`}
               >
-                <span className="mr-1">{tag.icon}</span>
+                <span className="mr-2">{tag.icon}</span>
                 {tag.value}
               </button>
             ))}
@@ -164,18 +167,18 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 
         {/* 検索結果表示 */}
         {(filteredCount !== undefined || totalCount !== undefined) && (
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-            <div className="text-sm text-gray-600">
-              <span className="font-medium text-blue-600">{filteredCount || 0}</span> 件の結果
+          <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+            <div className="text-lg text-gray-700">
+              <span className="font-bold text-blue-600 text-xl">{filteredCount || 0}</span> 件の結果
               {filteredCount !== totalCount && totalCount !== undefined && (
-                <span className="ml-2">（全{totalCount}件中）</span>
+                <span className="ml-2 text-gray-500">（全{totalCount}件中）</span>
               )}
             </div>
             
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
+            <div className="flex items-center space-x-3 text-sm text-gray-500">
               {sortBy === "distance" && userLocation && (
-                <div className="flex items-center">
-                  <svg className="w-4 h-4 mr-1 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center bg-green-50 px-3 py-2 rounded-xl border border-green-200">
+                  <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -184,8 +187,8 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
               )}
               
               {!userLocation && (
-                <div className="flex items-center text-yellow-600">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center bg-yellow-50 px-3 py-2 rounded-xl border border-yellow-200">
+                  <svg className="w-4 h-4 mr-2 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
                   位置情報を許可すると距離順ソートが利用できます
@@ -197,38 +200,38 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
 
         {/* アクティブフィルター表示 */}
         {hasActiveFilters && (
-          <div className="pt-3 border-t border-gray-200">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-gray-700">アクティブフィルター:</span>
-              <div className="flex flex-wrap gap-2">
+          <div className="pt-6 border-t border-gray-200">
+            <div className="flex items-center space-x-3">
+              <span className="text-lg font-bold text-gray-800">アクティブフィルター:</span>
+              <div className="flex flex-wrap gap-3">
                 {categoryFilter && (
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                  <span className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-xl shadow-lg">
                     📂 {categoryFilter}
                     <button
                       onClick={() => setCategoryFilter("")}
-                      className="ml-1 hover:text-red-600"
+                      className="ml-2 hover:text-red-200 transition-colors"
                     >
                       ×
                     </button>
                   </span>
                 )}
                 {tagFilters.map(tag => (
-                  <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">
+                  <span key={tag} className="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm font-semibold rounded-xl shadow-lg">
                     {TAG_OPTIONS.find(t => t.value === tag)?.icon} {tag}
                     <button
                       onClick={() => handleTagToggle(tag)}
-                      className="ml-1 hover:text-red-600"
+                      className="ml-2 hover:text-red-200 transition-colors"
                     >
                       ×
                     </button>
                   </span>
                 ))}
                 {search && (
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                  <span className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white text-sm font-semibold rounded-xl shadow-lg">
                     🔍 "{search}"
                     <button
                       onClick={() => setSearch("")}
-                      className="ml-1 hover:text-red-600"
+                      className="ml-2 hover:text-red-200 transition-colors"
                     >
                       ×
                     </button>

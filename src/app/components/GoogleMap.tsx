@@ -5,7 +5,7 @@ import SpotList from "./SpotList";
 import LoadingSkeleton from "./LoadingSkeleton";
 import ErrorMessage from "./ErrorMessage";
 import { useSpots } from "@/hooks/useSpots";
-import { SmokingSpot, Feedback, Photo, FeedbackForm, PhotoForm, ViewMode } from "@/types";
+import { SmokingSpot, Feedback, FeedbackForm, PhotoForm, ViewMode } from "@/types";
 
 // Google Maps APIの型定義
 declare global {

@@ -10,23 +10,19 @@ const FavoritesPage: React.FC = () => {
   const { favorites, clearFavorites } = useFavorites();
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedSpot, setSelectedSpot] = useState<SmokingSpotWithDistance | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // 位置情報を取得
     if (navigator.geolocation) {
-      setIsLoading(true);
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           });
-          setIsLoading(false);
         },
         (error) => {
           console.error('位置情報の取得に失敗しました:', error);
-          setIsLoading(false);
         },
         {
           enableHighAccuracy: false,

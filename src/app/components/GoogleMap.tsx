@@ -86,30 +86,17 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     }
   }, [onSpotSelect]);
 
-  // Google Maps APIの読み込みと初期化
+  // Google Maps APIの読み込み
   useEffect(() => {
     const loadGoogleMapsAPI = () => {
-      if (window.google && window.google.maps && mapRef.current) {
-        initializeMap();
-        return;
+      if (window.google && window.google.maps) {
+        return; // 既にロード済み
       }
 
       // Google Maps APIが既にロードされているかチェック
       const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
       if (existingScript) {
-        // 既存のスクリプトがある場合は、ロード完了を待つ
-        const checkGoogleMaps = () => {
-          if (window.google && window.google.maps && mapRef.current) {
-            initializeMap();
-          } else if (window.google && window.google.maps) {
-            // Google Maps APIはロード済みだが、mapRefがまだ利用できない場合は少し待つ
-            setTimeout(checkGoogleMaps, 100);
-          } else {
-            setTimeout(checkGoogleMaps, 100);
-          }
-        };
-        checkGoogleMaps();
-        return;
+        return; // 既にロード中またはロード済み
       }
 
       // 新しいスクリプトをロード
@@ -117,17 +104,6 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env['NEXT_PUBLIC_GOOGLE_MAPS_API_KEY'] || ''}&libraries=places`;
       script.async = true;
       script.defer = true;
-      script.onload = () => {
-        // スクリプトロード後、mapRefが利用可能になるまで待つ
-        const checkMapRef = () => {
-          if (mapRef.current) {
-            initializeMap();
-          } else {
-            setTimeout(checkMapRef, 100);
-          }
-        };
-        checkMapRef();
-      };
       script.onerror = () => {
         console.error('Google Maps APIの読み込みに失敗しました');
       };
@@ -137,6 +113,21 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     if (typeof window !== "undefined") {
       loadGoogleMapsAPI();
     }
+  }, []);
+
+  // マップの初期化（Google Maps APIとmapRefが利用可能になったら実行）
+  useEffect(() => {
+    const checkAndInitialize = () => {
+      if (window.google && window.google.maps && mapRef.current) {
+        console.log('Initializing map - both Google Maps API and mapRef are available');
+        initializeMap();
+      } else {
+        // まだ準備ができていない場合は少し待ってから再試行
+        setTimeout(checkAndInitialize, 100);
+      }
+    };
+
+    checkAndInitialize();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

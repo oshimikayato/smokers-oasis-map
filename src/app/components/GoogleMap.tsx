@@ -111,7 +111,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 
       // 新しいスクリプトをロード
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env['NEXT_PUBLIC_GOOGLE_MAPS_API_KEY'] || ''}&libraries=places&loading=async`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env['NEXT_PUBLIC_GOOGLE_MAPS_API_KEY'] || ''}&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = initializeMap;
@@ -129,9 +129,14 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 
   // マップ初期化関数
   const initializeMap = useCallback(() => {
-    if (!mapRef.current || !window.google) return;
+    console.log('initializeMap called', { mapRef: mapRef.current, google: !!window.google });
+    if (!mapRef.current || !window.google) {
+      console.log('Map initialization failed: missing mapRef or Google Maps API');
+      return;
+    }
 
     const center = userLocation || { lat: 35.6762, lng: 139.6503 }; // デフォルト: 東京
+    console.log('Initializing map with center:', center);
 
     const mapInstance = new window.google.maps.Map(mapRef.current, {
       center,
@@ -145,6 +150,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       ]
     });
 
+    console.log('Map instance created:', mapInstance);
     setMap(mapInstance);
 
     // マーカーをクリア
@@ -154,6 +160,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     window.markers = [];
 
     // フィルタリングされたスポットにマーカーを追加
+    console.log('Adding markers for spots:', filteredSpots.length);
     filteredSpots.forEach(spot => {
       const marker = new window.google.maps.Marker({
         position: { lat: spot.lat, lng: spot.lng },

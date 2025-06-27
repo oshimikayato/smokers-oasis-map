@@ -38,17 +38,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const googleMapsApiKey = process.env['NEXT_PUBLIC_GOOGLE_MAPS_API_KEY'];
-  
   return (
     <html lang="ja">
       <head>
-        {googleMapsApiKey && (
-          <Script
-            src={`https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&loading=async`}
-            strategy="beforeInteractive"
-          />
-        )}
         <link rel="icon" type="image/png" href="/favicon.png" />
       </head>
       <body

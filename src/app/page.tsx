@@ -20,8 +20,6 @@ export default function Home() {
   // カスタムフックを使用
   const {
     filteredSpots,
-    isLoading,
-    error,
     userLocation,
     search,
     setSearch,

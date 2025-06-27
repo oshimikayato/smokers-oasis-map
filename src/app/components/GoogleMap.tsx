@@ -29,7 +29,6 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   const mapRef = useRef<HTMLDivElement>(null);
   const [selectedSpot, setSelectedSpot] = useState<SmokingSpot | null>(null);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
-  const [photos, setPhotos] = useState<Photo[]>([]);
   const [feedbackForm, setFeedbackForm] = useState<FeedbackForm>({ found: undefined, rating: 0, comment: "", reportType: "" });
   const [showForm, setShowForm] = useState(false);
   const [map, setMap] = useState<any>(null);
@@ -227,7 +226,8 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         setPhotoForm({ url: "", caption: "" });
         // 写真リストを更新
         const newPhoto = await response.json();
-        setPhotos(prev => [...prev, newPhoto]);
+        // 写真の追加が成功したことを確認
+        console.log('写真が追加されました:', newPhoto);
       }
     } catch (error) {
       console.error('写真アップロードエラー:', error);

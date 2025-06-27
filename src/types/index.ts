@@ -1,9 +1,34 @@
-import type { Prisma } from '@prisma/client';
+// 基本型定義
+export interface SmokingSpot {
+  id: number;
+  name: string;
+  lat: number;
+  lng: number;
+  address: string | null;
+  description: string | null;
+  category: string;
+  tags: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-// Prismaから生成される型
-export type SmokingSpot = Prisma.SmokingSpotGetPayload<{}>;
-export type Feedback = Prisma.FeedbackGetPayload<{}>;
-export type Photo = Prisma.PhotoGetPayload<{}>;
+export interface Feedback {
+  id: number;
+  spotId: number;
+  found: boolean;
+  rating: number;
+  comment: string;
+  reportType: string;
+  createdAt: Date;
+}
+
+export interface Photo {
+  id: number;
+  spotId: number;
+  url: string;
+  caption: string;
+  createdAt: Date;
+}
 
 // カスタム型定義（nullableフィールドを適切に処理）
 export interface SmokingSpotWithDistance extends Omit<SmokingSpot, 'address' | 'description'> {
@@ -27,6 +52,8 @@ export interface PhotoForm {
 export interface UserLocation {
   lat: number;
   lng: number;
+  accuracy?: number; // 精度（メートル）
+  timestamp?: number; // タイムスタンプ
 }
 
 export type SortOption = "name" | "distance";

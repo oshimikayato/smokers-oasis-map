@@ -19,30 +19,110 @@ export function useSpots() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [isLocationLoading, setIsLocationLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("name");
 
-  // 現在地取得
+  // 現在地取得（改善版）
   const getUserLocation = useCallback(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const location = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          setUserLocation(location);
-        },
-        () => {
-          console.log("位置情報の取得に失敗しました");
-        }
-      );
+    if (!navigator.geolocation) {
+      setLocationError("お使いのブラウザは位置情報をサポートしていません");
+      return;
     }
+
+    setIsLocationLoading(true);
+    setLocationError(null);
+
+    const options = {
+      enableHighAccuracy: true, // 高精度な位置情報を要求
+      timeout: 10000, // 10秒でタイムアウト
+      maximumAge: 300000 // 5分以内のキャッシュされた位置情報を使用
+    };
+
+    const successCallback = (position: GeolocationPosition) => {
+      const location = { 
+        lat: position.coords.latitude, 
+        lng: position.coords.longitude,
+        accuracy: position.coords.accuracy, // 精度（メートル）
+        timestamp: position.timestamp
+      };
+      setUserLocation(location);
+      setLocationError(null);
+      setIsLocationLoading(false);
+      console.log('現在地を取得しました:', location);
+    };
+
+    const errorCallback = (error: GeolocationPositionError) => {
+      setIsLocationLoading(false);
+      let errorMessage = "位置情報の取得に失敗しました";
+      
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          errorMessage = "位置情報の使用が許可されていません。ブラウザの設定で位置情報を許可してください。";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          errorMessage = "位置情報を取得できませんでした。";
+          break;
+        case error.TIMEOUT:
+          errorMessage = "位置情報の取得がタイムアウトしました。";
+          break;
+        default:
+          errorMessage = "位置情報の取得中にエラーが発生しました。";
+      }
+      
+      setLocationError(errorMessage);
+      console.error('位置情報取得エラー:', error);
+    };
+
+    navigator.geolocation.getCurrentPosition(successCallback, errorCallback, options);
   }, []);
 
-  // 現在地取得
+  // 位置情報の監視（リアルタイム更新）
+  const startLocationWatching = useCallback(() => {
+    if (!navigator.geolocation) return;
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 60000 // 1分以内のキャッシュ
+    };
+
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const location = { 
+          lat: position.coords.latitude, 
+          lng: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          timestamp: position.timestamp
+        };
+        setUserLocation(location);
+        setLocationError(null);
+      },
+      (error) => {
+        console.error('位置情報監視エラー:', error);
+      },
+      options
+    );
+
+    return watchId;
+  }, []);
+
+  // 現在地取得の初期化
   useEffect(() => {
     getUserLocation();
-  }, [getUserLocation]);
+    
+    // 位置情報の監視を開始（オプション）
+    const watchId = startLocationWatching();
+    
+    return () => {
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
+  }, [getUserLocation, startLocationWatching]);
 
   // APIから喫煙所データを取得
   useEffect(() => {
@@ -129,6 +209,8 @@ export function useSpots() {
     isLoading,
     error,
     userLocation,
+    locationError,
+    isLocationLoading,
     search,
     setSearch,
     categoryFilter,
@@ -138,6 +220,7 @@ export function useSpots() {
     sortBy,
     setSortBy,
     resetFilters,
-    getUserLocation
+    getUserLocation,
+    startLocationWatching
   };
 } 

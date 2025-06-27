@@ -80,11 +80,6 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     saveFavorites();
   }, [saveFavorites]);
 
-  // お気に入り切り替えをメモ化
-  const toggleFavorite = useCallback((spotId: number) => {
-    setFavorites(favs => favs.includes(spotId) ? favs.filter(id => id !== spotId) : [...favs, spotId]);
-  }, []);
-
   // スポット選択ハンドラー
   const handleSpotSelect = useCallback((spot: SmokingSpot) => {
     setSelectedSpot(spot);

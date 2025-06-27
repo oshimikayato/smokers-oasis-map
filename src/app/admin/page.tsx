@@ -1,29 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { SmokingSpotWithDistance } from '../../types';
-
-interface Spot {
-  id: number;
-  name: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-  category: string;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface AdminStats {
-  totalSpots: number;
-  totalFeedbacks: number;
-  totalPhotos: number;
-  recentSpots: Spot[];
-  recentFeedbacks: any[];
-}
 
 const AdminPage: React.FC = () => {
   const [spots, setSpots] = useState<SmokingSpotWithDistance[]>([]);
@@ -32,11 +11,10 @@ const AdminPage: React.FC = () => {
   const [favorites, setFavorites] = useState<SmokingSpotWithDistance[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const [showLogin, setShowLogin] = useState(false);
-  const [stats, setStats] = useState<AdminStats | null>(null);
-  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
-  const [loginError, setLoginError] = useState('');
-  const router = useRouter();
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const loadData = async () => {
     setIsLoading(true);
@@ -107,143 +85,12 @@ const AdminPage: React.FC = () => {
 
   const currentStats = getStats();
 
-  const loadStats = useCallback(async () => {
-    try {
-      const [spotsRes, feedbacksRes, photosRes] = await Promise.all([
-        fetch('/api/spots'),
-        fetch('/api/feedback'),
-        fetch('/api/photos')
-      ]);
-
-      const spots = await spotsRes.json();
-      const feedbacks = await feedbacksRes.json();
-      const photos = await photosRes.json();
-
-      setStats({
-        totalSpots: spots.length,
-        totalFeedbacks: feedbacks.length,
-        totalPhotos: photos.length,
-        recentSpots: spots.slice(-5).reverse(),
-        recentFeedbacks: feedbacks.slice(-5).reverse()
-      });
-    } catch (error) {
-      console.error('Stats load error:', error);
-    }
-  }, []);
-
-  const checkAuth = useCallback(async () => {
-    try {
-      const response = await fetch('/api/auth/verify');
-      const data = await response.json();
-      
-      if (data.authenticated) {
-        loadStats();
-      } else {
-        setShowLogin(true);
-      }
-    } catch (error) {
-      console.error('Auth check error:', error);
-      setShowLogin(true);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [loadStats]);
-
-  // 認証状態をチェック
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginError('');
-
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginForm)
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        loadStats();
-      } else {
-        setLoginError(data.message);
-      }
-    } catch (error) {
-      setLoginError('ログイン処理中にエラーが発生しました');
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      setStats(null);
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         <Header />
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (showLogin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-lg">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">システム管理</h2>
-            <p className="mt-2 text-gray-600">yourbreakspot.com システム設定</p>
-          </div>
-          
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                ユーザー名
-              </label>
-              <input
-                type="text"
-                value={loginForm.username}
-                onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                パスワード
-              </label>
-              <input
-                type="password"
-                value={loginForm.password}
-                onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
-
-            {loginError && (
-              <div className="text-red-600 text-sm">{loginError}</div>
-            )}
-
-            <button
-              type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              ログイン
-            </button>
-          </form>
         </div>
       </div>
     );

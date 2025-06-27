@@ -60,26 +60,6 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     getUserLocation
   } = useSpots();
 
-  // お気に入り機能
-  const [favorites, setFavorites] = useState<number[]>(() => {
-    if (typeof window !== "undefined") {
-      const fav = localStorage.getItem("favorites");
-      return fav ? JSON.parse(fav) : [];
-    }
-    return [];
-  });
-
-  // お気に入り保存をメモ化
-  const saveFavorites = useCallback(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("favorites", JSON.stringify(favorites));
-    }
-  }, [favorites]);
-
-  useEffect(() => {
-    saveFavorites();
-  }, [saveFavorites]);
-
   // スポット選択ハンドラー
   const handleSpotSelect = useCallback((spot: SmokingSpot) => {
     setSelectedSpot(spot);

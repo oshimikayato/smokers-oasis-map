@@ -8,6 +8,7 @@ interface SpotListProps {
   onToggleFavorite: (spotId: number) => void;
   onSelectSpot: (spot: SmokingSpotWithDistance) => void;
   userLocation: { lat: number; lng: number } | null;
+  selectedSpotId?: number | null;
 }
 
 const SpotList: React.FC<SpotListProps> = ({
@@ -15,7 +16,8 @@ const SpotList: React.FC<SpotListProps> = ({
   favorites,
   onToggleFavorite,
   onSelectSpot,
-  userLocation
+  userLocation,
+  selectedSpotId
 }) => {
   const formatDistance = (distance?: number) => {
     if (!distance) return null;
@@ -59,101 +61,119 @@ const SpotList: React.FC<SpotListProps> = ({
           </div>
         ) : (
           <div className="divide-y divide-gray-200">
-            {spots.map(spot => (
-              <div
-                key={spot['id']}
-                className="p-4 hover:bg-gray-50 transition-colors cursor-pointer focus:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onClick={() => onSelectSpot(spot)}
-                onKeyDown={(e) => handleKeyDown(e, spot)}
-                tabIndex={0}
-                role="option"
-                aria-selected="false"
-                aria-label={`${spot['name']}、${spot['category']}、${spot['address'] || '住所不明'}`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg" aria-hidden="true">{getCategoryIcon(spot['category'])}</span>
-                      <h4 className="text-sm font-medium text-gray-900 truncate">
-                        {spot['name']}
-                      </h4>
-                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                        {spot['category']}
-                      </span>
-                    </div>
-                    
-                    {spot['address'] && (
-                      <p className="text-xs text-gray-600 mb-2 truncate">
-                        <span aria-hidden="true">📍</span> {spot['address']}
-                      </p>
-                    )}
-                    
-                    {spot['distance'] && userLocation && (
-                      <p className="text-xs text-blue-600 font-medium mb-2">
-                        <span aria-hidden="true">📏</span> {formatDistance(spot['distance'])}
-                      </p>
-                    )}
-                    
-                    {spot['description'] && (
-                      <p className="text-xs text-gray-600 mb-2 line-clamp-2">
-                        {spot['description']}
-                      </p>
-                    )}
-                    
-                    <div className="flex flex-wrap gap-1" role="group" aria-label="タグ">
-                      {typeof spot['tags'] === 'string' && spot['tags'].split(',').slice(0, 3).map((tag: string, tagIndex: number) => (
-                        <span
-                          key={tagIndex}
-                          className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"
-                        >
-                          {tag.trim()}
+            {spots.map(spot => {
+              const isSelected = selectedSpotId === spot['id'];
+              return (
+                <div
+                  key={spot['id']}
+                  className={`p-4 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    isSelected 
+                      ? 'bg-blue-50 border-l-4 border-blue-500 shadow-md' 
+                      : 'hover:bg-gray-50 focus:bg-blue-50'
+                  }`}
+                  onClick={() => onSelectSpot(spot)}
+                  onKeyDown={(e) => handleKeyDown(e, spot)}
+                  tabIndex={0}
+                  role="option"
+                  aria-selected={isSelected}
+                  aria-label={`${spot['name']}、${spot['category']}、${spot['address'] || '住所不明'}`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-lg" aria-hidden="true">{getCategoryIcon(spot['category'])}</span>
+                        <h4 className={`text-sm font-medium truncate ${
+                          isSelected ? 'text-blue-900' : 'text-gray-900'
+                        }`}>
+                          {spot['name']}
+                        </h4>
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          isSelected 
+                            ? 'bg-blue-100 text-blue-800' 
+                            : 'text-gray-500 bg-gray-100'
+                        }`}>
+                          {spot['category']}
                         </span>
-                      ))}
-                      {typeof spot['tags'] === 'string' && spot['tags'].split(',').length > 3 && (
-                        <span className="text-xs text-gray-500">
-                          +{spot['tags'].split(',').length - 3}
-                        </span>
+                        {isSelected && (
+                          <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full">
+                            選択中
+                          </span>
+                        )}
+                      </div>
+                      
+                      {spot['address'] && (
+                        <p className="text-xs text-gray-600 mb-2 truncate">
+                          <span aria-hidden="true">📍</span> {spot['address']}
+                        </p>
                       )}
+                      
+                      {spot['distance'] && userLocation && (
+                        <p className="text-xs text-blue-600 font-medium mb-2">
+                          <span aria-hidden="true">📏</span> {formatDistance(spot['distance'])}
+                        </p>
+                      )}
+                      
+                      {spot['description'] && (
+                        <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+                          {spot['description']}
+                        </p>
+                      )}
+                      
+                      <div className="flex flex-wrap gap-1" role="group" aria-label="タグ">
+                        {typeof spot['tags'] === 'string' && spot['tags'].split(',').slice(0, 3).map((tag: string, tagIndex: number) => (
+                          <span
+                            key={tagIndex}
+                            className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"
+                          >
+                            {tag.trim()}
+                          </span>
+                        ))}
+                        {typeof spot['tags'] === 'string' && spot['tags'].split(',').length > 3 && (
+                          <span className="text-xs text-gray-500">
+                            +{spot['tags'].split(',').length - 3}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onToggleFavorite(spot['id']);
-                    }}
-                    onKeyDown={(e) => {
-                      e.stopPropagation();
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
+                    
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
                         onToggleFavorite(spot['id']);
-                      }
-                    }}
-                    className={`ml-3 p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 ${
-                      favorites.includes(spot['id'])
-                        ? 'text-red-500 hover:text-red-600'
-                        : 'text-gray-400 hover:text-gray-600'
-                    }`}
-                    aria-label={favorites.includes(spot['id']) ? `${spot['name']}をお気に入りから削除` : `${spot['name']}をお気に入りに追加`}
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill={favorites.includes(spot['id']) ? "currentColor" : "none"}
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
+                      }}
+                      onKeyDown={(e) => {
+                        e.stopPropagation();
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onToggleFavorite(spot['id']);
+                        }
+                      }}
+                      className={`ml-3 p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                        favorites.includes(spot['id'])
+                          ? 'text-red-500 hover:text-red-600'
+                          : 'text-gray-400 hover:text-gray-600'
+                      }`}
+                      aria-label={favorites.includes(spot['id']) ? `${spot['name']}をお気に入りから削除` : `${spot['name']}をお気に入りに追加`}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                      />
-                    </svg>
-                  </button>
+                      <svg
+                        className="w-5 h-5"
+                        fill={favorites.includes(spot['id']) ? "currentColor" : "none"}
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

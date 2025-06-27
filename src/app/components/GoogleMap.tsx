@@ -19,12 +19,14 @@ interface GoogleMapProps {
   showSearchFilters?: boolean;
   showSpotList?: boolean;
   onSpotSelect?: (spot: SmokingSpot) => void;
+  selectedSpotId?: number | null;
 }
 
 const GoogleMap: React.FC<GoogleMapProps> = ({
   showSearchFilters = true,
   showSpotList = false,
-  onSpotSelect
+  onSpotSelect,
+  selectedSpotId
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapElement, setMapElement] = useState<HTMLDivElement | null>(null);
@@ -86,7 +88,48 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     if (onSpotSelect) {
       onSpotSelect(spot);
     }
-  }, [onSpotSelect]);
+    
+    // マップが存在する場合、選択されたスポットに移動
+    if (map) {
+      const position = { lat: spot.lat, lng: spot.lng };
+      map.setCenter(position);
+      map.setZoom(16);
+      
+      // 選択されたスポットのマーカーをハイライト
+      if (window.markers) {
+        window.markers.forEach(marker => {
+          const markerPosition = marker.getPosition();
+          if (markerPosition && 
+              markerPosition.lat() === spot.lat && 
+              markerPosition.lng() === spot.lng) {
+            // 選択されたマーカーをハイライト
+            marker.setIcon({
+              url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="12" fill="#FFD700" stroke="#FF6B6B" stroke-width="3"/>
+                  <path d="M8 12h8M12 8v8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              `),
+              scaledSize: new window.google.maps.Size(32, 32),
+              anchor: new window.google.maps.Point(16, 16)
+            });
+          } else {
+            // 他のマーカーを通常表示に戻す
+            marker.setIcon({
+              url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#FF6B6B" stroke="#fff" stroke-width="2"/>
+                  <path d="M8 12h8M12 8v8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              `),
+              scaledSize: new window.google.maps.Size(24, 24),
+              anchor: new window.google.maps.Point(12, 12)
+            });
+          }
+        });
+      }
+    }
+  }, [onSpotSelect, map]);
 
   // refの設定を確実にするためのコールバック
   const setMapRef = useCallback((node: HTMLDivElement | null) => {
@@ -245,6 +288,51 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       });
     }
   }, [map, filteredSpots, handleSpotSelect]);
+
+  // 選択されたスポットのハイライト表示
+  useEffect(() => {
+    if (map && window.markers && selectedSpotId) {
+      const selectedSpot = filteredSpots.find(spot => spot.id === selectedSpotId);
+      if (selectedSpot) {
+        // マップの中心を選択されたスポットに移動
+        const position = { lat: selectedSpot.lat, lng: selectedSpot.lng };
+        map.setCenter(position);
+        map.setZoom(16);
+        
+        // マーカーをハイライト
+        window.markers.forEach(marker => {
+          const markerPosition = marker.getPosition();
+          if (markerPosition && 
+              markerPosition.lat() === selectedSpot.lat && 
+              markerPosition.lng() === selectedSpot.lng) {
+            // 選択されたマーカーをハイライト
+            marker.setIcon({
+              url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="12" fill="#FFD700" stroke="#FF6B6B" stroke-width="3"/>
+                  <path d="M8 12h8M12 8v8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              `),
+              scaledSize: new window.google.maps.Size(32, 32),
+              anchor: new window.google.maps.Point(16, 16)
+            });
+          } else {
+            // 他のマーカーを通常表示に戻す
+            marker.setIcon({
+              url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#FF6B6B" stroke="#fff" stroke-width="2"/>
+                  <path d="M8 12h8M12 8v8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              `),
+              scaledSize: new window.google.maps.Size(24, 24),
+              anchor: new window.google.maps.Point(12, 12)
+            });
+          }
+        });
+      }
+    }
+  }, [selectedSpotId, map, filteredSpots]);
 
   // フォーム変更ハンドラー
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

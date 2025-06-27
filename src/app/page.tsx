@@ -20,17 +20,7 @@ export default function Home() {
   // カスタムフックを使用
   const {
     filteredSpots,
-    userLocation,
-    search,
-    setSearch,
-    categoryFilter,
-    setCategoryFilter,
-    tagFilters,
-    setTagFilters,
-    sortBy,
-    setSortBy,
-    resetFilters,
-    getUserLocation
+    userLocation
   } = useSpots();
 
   // お気に入り切り替え

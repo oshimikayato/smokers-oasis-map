@@ -9,13 +9,11 @@ const nextConfig: NextConfig = {
     domains: ['images.unsplash.com', 'via.placeholder.com'],
   },
   serverExternalPackages: ['@prisma/client'],
-  experimental: {
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },

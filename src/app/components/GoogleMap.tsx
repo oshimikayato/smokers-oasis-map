@@ -115,7 +115,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [mapRef.current]);
+  }, []);
 
   // Google Maps APIの読み込み
   useEffect(() => {

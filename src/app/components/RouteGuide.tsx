@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React from 'react';
 import { SmokingSpotWithDistance } from '@/types';
 
 interface RouteGuideProps {
@@ -9,8 +9,6 @@ interface RouteGuideProps {
 }
 
 const RouteGuide: React.FC<RouteGuideProps> = ({ spot, userLocation, onClose }) => {
-  const [isLoading, setIsLoading] = useState(false);
-
   const openGoogleMaps = () => {
     if (!userLocation) {
       alert('現在地が取得できません。位置情報の許可を確認してください。');

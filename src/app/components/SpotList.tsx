@@ -1,12 +1,12 @@
 "use client";
 import React from 'react';
-import { SmokingSpot } from '@/types';
+import { SmokingSpotWithDistance } from '@/types';
 
 interface SpotListProps {
-  spots: SmokingSpot[];
+  spots: SmokingSpotWithDistance[];
   favorites: number[];
   onToggleFavorite: (spotId: number) => void;
-  onSelectSpot: (spot: SmokingSpot) => void;
+  onSelectSpot: (spot: SmokingSpotWithDistance) => void;
   userLocation: { lat: number; lng: number } | null;
 }
 
@@ -29,7 +29,7 @@ const SpotList: React.FC<SpotListProps> = ({
     return category === "喫煙所" ? "🚬" : "🍽️";
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent, spot: SmokingSpot) => {
+  const handleKeyDown = (e: React.KeyboardEvent, spot: SmokingSpotWithDistance) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onSelectSpot(spot);
@@ -61,47 +61,47 @@ const SpotList: React.FC<SpotListProps> = ({
           <div className="divide-y divide-gray-200">
             {spots.map(spot => (
               <div
-                key={spot.id}
+                key={spot['id']}
                 className="p-4 hover:bg-gray-50 transition-colors cursor-pointer focus:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onClick={() => onSelectSpot(spot)}
                 onKeyDown={(e) => handleKeyDown(e, spot)}
                 tabIndex={0}
                 role="option"
                 aria-selected="false"
-                aria-label={`${spot.name}、${spot.category}、${spot.address || '住所不明'}`}
+                aria-label={`${spot['name']}、${spot['category']}、${spot['address'] || '住所不明'}`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg" aria-hidden="true">{getCategoryIcon(spot.category)}</span>
+                      <span className="text-lg" aria-hidden="true">{getCategoryIcon(spot['category'])}</span>
                       <h4 className="text-sm font-medium text-gray-900 truncate">
-                        {spot.name}
+                        {spot['name']}
                       </h4>
                       <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                        {spot.category}
+                        {spot['category']}
                       </span>
                     </div>
                     
-                    {spot.address && (
+                    {spot['address'] && (
                       <p className="text-xs text-gray-600 mb-2 truncate">
-                        <span aria-hidden="true">📍</span> {spot.address}
+                        <span aria-hidden="true">📍</span> {spot['address']}
                       </p>
                     )}
                     
-                    {spot.distance && userLocation && (
+                    {spot['distance'] && userLocation && (
                       <p className="text-xs text-blue-600 font-medium mb-2">
-                        <span aria-hidden="true">📏</span> {formatDistance(spot.distance)}
+                        <span aria-hidden="true">📏</span> {formatDistance(spot['distance'])}
                       </p>
                     )}
                     
-                    {spot.description && (
+                    {spot['description'] && (
                       <p className="text-xs text-gray-600 mb-2 line-clamp-2">
-                        {spot.description}
+                        {spot['description']}
                       </p>
                     )}
                     
                     <div className="flex flex-wrap gap-1" role="group" aria-label="タグ">
-                      {typeof spot.tags === 'string' && spot.tags.split(',').slice(0, 3).map((tag: string, tagIndex: number) => (
+                      {typeof spot['tags'] === 'string' && spot['tags'].split(',').slice(0, 3).map((tag: string, tagIndex: number) => (
                         <span
                           key={tagIndex}
                           className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"
@@ -109,9 +109,9 @@ const SpotList: React.FC<SpotListProps> = ({
                           {tag.trim()}
                         </span>
                       ))}
-                      {typeof spot.tags === 'string' && spot.tags.split(',').length > 3 && (
+                      {typeof spot['tags'] === 'string' && spot['tags'].split(',').length > 3 && (
                         <span className="text-xs text-gray-500">
-                          +{spot.tags.split(',').length - 3}
+                          +{spot['tags'].split(',').length - 3}
                         </span>
                       )}
                     </div>
@@ -120,25 +120,25 @@ const SpotList: React.FC<SpotListProps> = ({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onToggleFavorite(spot.id);
+                      onToggleFavorite(spot['id']);
                     }}
                     onKeyDown={(e) => {
                       e.stopPropagation();
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        onToggleFavorite(spot.id);
+                        onToggleFavorite(spot['id']);
                       }
                     }}
                     className={`ml-3 p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 ${
-                      favorites.includes(spot.id)
+                      favorites.includes(spot['id'])
                         ? 'text-red-500 hover:text-red-600'
                         : 'text-gray-400 hover:text-gray-600'
                     }`}
-                    aria-label={favorites.includes(spot.id) ? `${spot.name}をお気に入りから削除` : `${spot.name}をお気に入りに追加`}
+                    aria-label={favorites.includes(spot['id']) ? `${spot['name']}をお気に入りから削除` : `${spot['name']}をお気に入りに追加`}
                   >
                     <svg
                       className="w-5 h-5"
-                      fill={favorites.includes(spot.id) ? "currentColor" : "none"}
+                      fill={favorites.includes(spot['id']) ? "currentColor" : "none"}
                       stroke="currentColor"
                       viewBox="0 0 24 24"
                       aria-hidden="true"

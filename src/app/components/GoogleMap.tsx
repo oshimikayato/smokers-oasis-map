@@ -233,34 +233,6 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     }
   };
 
-  // 通報機能
-  const handleReport = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedSpot) return;
-
-    try {
-      const response = await fetch('/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          spotId: selectedSpot.id,
-          found: false,
-          rating: 0,
-          comment: feedbackForm.comment,
-          reportType: feedbackForm.reportType
-        })
-      });
-
-      if (response.ok) {
-        setShowForm(false);
-        setFeedbackForm({ found: undefined, rating: 0, comment: "", reportType: "" });
-        alert('通報を送信しました。ありがとうございます。');
-      }
-    } catch (error) {
-      console.error('通報送信エラー:', error);
-    }
-  };
-
   // 信頼度スコア計算
   function calcTrustScore(feedbacks: Feedback[]): number {
     if (feedbacks.length === 0) return 0;

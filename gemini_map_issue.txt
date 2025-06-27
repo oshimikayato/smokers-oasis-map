@@ -1,0 +1,67 @@
+# Google Maps表示問題の相談
+
+## 現在の問題
+- Google Maps APIは正常にロードされている（google: true, googleMaps: true）
+- しかし、mapElementが常にfalseのまま
+- マップコンテナのrefが正しく設定されていない
+
+## 現在のコード構造
+```typescript
+const mapRef = useRef<HTMLDivElement>(null);
+const [mapElement, setMapElement] = useState<HTMLDivElement | null>(null);
+const [isMapContainerReady, setIsMapContainerReady] = useState(false);
+
+// mapRefの変更を監視してmapElementを更新
+useEffect(() => {
+  console.log('mapRef useEffect triggered', { mapRef: mapRef.current });
+  
+  const checkAndSetMapElement = () => {
+    if (mapRef.current) {
+      console.log('Setting mapElement to:', mapRef.current);
+      setMapElement(mapRef.current);
+      setIsMapContainerReady(true);
+      return true;
+    }
+    return false;
+  };
+
+  // 最初のチェック
+  if (!checkAndSetMapElement()) {
+    console.log('mapRef.current is null, retrying...');
+    const timer = setTimeout(() => {
+      if (!checkAndSetMapElement()) {
+        console.log('mapRef.current is still null after retry');
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }
+  
+  return undefined;
+}, [mapRef]);
+
+// マップコンテナのJSX
+<div 
+  ref={mapRef} 
+  id="google-map-container"
+  className="w-full h-96 rounded-lg" 
+  style={{ minHeight: '384px' }}
+/>
+```
+
+## デバッグログ
+- "mapRef useEffect triggered" は表示される
+- "DOM element check:" で mapRef: false が表示される
+- "mapRef.current is null, retrying..." が表示される
+- "mapRef.current is still null after retry" が表示される
+
+## 考えられる原因
+1. useEffectの依存配列にmapRefを指定しているため、無限ループが発生している可能性
+2. mapRefが可変値のため、依存配列に含めるべきではない
+3. コンポーネントのマウントタイミングの問題
+4. Next.jsのSSR/CSRの問題
+
+## 質問
+1. この問題の根本原因は何でしょうか？
+2. どのような修正方法が最適でしょうか？
+3. useEffectの依存配列はどうすべきでしょうか？
+4. より確実にDOM要素を取得する方法はありますか？ 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useLayoutEffect } from "react";
 import SearchFilters from "./SearchFilters";
 import SpotList from "./SpotList";
 import LoadingSkeleton from "./LoadingSkeleton";
@@ -89,8 +89,8 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   }, [onSpotSelect]);
 
   // mapRefの変更を監視してmapElementを更新
-  useEffect(() => {
-    console.log('mapRef useEffect triggered', { mapRef: mapRef.current });
+  useLayoutEffect(() => {
+    console.log('mapRef useLayoutEffect triggered', { mapRef: mapRef.current });
     
     // DOM要素の存在確認
     const mapContainer = document.getElementById('google-map-container');
@@ -123,7 +123,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     }
     
     return undefined; // 明示的にundefinedを返す
-  }, [mapRef]); // mapRefの変更を監視
+  }, []); // 依存配列を空にする - mapRefは可変値なので含めない
 
   // Google Maps APIの読み込み
   useEffect(() => {
@@ -421,6 +421,12 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
                 <p className="text-gray-500">マップを読み込み中...</p>
               </div>
             )}
+            {/* デバッグ情報 */}
+            <div className="mt-2 text-xs text-gray-500">
+              mapRef: {mapRef.current ? 'available' : 'null'}, 
+              mapElement: {mapElement ? 'set' : 'null'}, 
+              isReady: {isMapContainerReady ? 'true' : 'false'}
+            </div>
           </div>
         </div>
 

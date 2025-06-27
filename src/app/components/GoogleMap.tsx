@@ -90,85 +90,37 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 
   // refの設定を確実にするためのコールバック
   const setMapRef = useCallback((node: HTMLDivElement | null) => {
-    console.log('setMapRef called with:', node);
     if (node) {
-      console.log('Setting mapElement to:', node);
       setMapElement(node);
       setIsMapContainerReady(true);
     }
   }, []);
 
-  // mapRefの変更を監視してmapElementを更新
-  useEffect(() => {
-    console.log('mapRef useEffect triggered', { mapRef: mapRef.current });
-    
-    // DOM要素の存在確認
-    const mapContainer = document.getElementById('google-map-container');
-    console.log('DOM element check:', { 
-      mapContainer: !!mapContainer, 
-      mapRef: !!mapRef.current,
-      mapRefCurrent: mapRef.current 
-    });
-    
-    const checkAndSetMapElement = () => {
-      if (mapRef.current) {
-        console.log('Setting mapElement to:', mapRef.current);
-        setMapElement(mapRef.current);
-        setIsMapContainerReady(true);
-        return true;
-      }
-      return false;
-    };
-
-    // 最初のチェック
-    if (!checkAndSetMapElement()) {
-      console.log('mapRef.current is null, retrying...');
-      // mapRefがnullの場合は少し待ってから再試行
-      const timer = setTimeout(() => {
-        if (!checkAndSetMapElement()) {
-          console.log('mapRef.current is still null after retry');
-        }
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-    
-    return undefined; // 明示的にundefinedを返す
-  }, []); // 依存配列を空にする - mapRefは可変値なので含めない
-
-  // 追加: mapRefの変更を監視するuseEffect
-  useEffect(() => {
-    if (mapRef.current && !mapElement) {
-      console.log('mapRef changed, setting mapElement');
-      setMapElement(mapRef.current);
-      setIsMapContainerReady(true);
-    }
-  }, [mapElement]);
-
   // Google Maps APIの読み込み
   useEffect(() => {
-    console.log('Google Maps API loading useEffect triggered');
     const loadGoogleMapsAPI = () => {
+      // 既にロード済みの場合は何もしない
       if (window.google && window.google.maps) {
-        console.log('Google Maps API already loaded');
-        return; // 既にロード済み
+        return;
       }
 
-      // Google Maps APIが既にロードされているかチェック
+      // 既にロード中の場合は何もしない
       const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
       if (existingScript) {
-        console.log('Google Maps API script already exists');
-        return; // 既にロード中またはロード済み
+        return;
       }
 
-      console.log('Loading Google Maps API...');
       // 新しいスクリプトをロード
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env['NEXT_PUBLIC_GOOGLE_MAPS_API_KEY'] || ''}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env['NEXT_PUBLIC_GOOGLE_MAPS_API_KEY'] || ''}&libraries=places&loading=async&callback=initMap`;
       script.async = true;
       script.defer = true;
-      script.onload = () => {
+      
+      // グローバルコールバック関数を定義
+      (window as any).initMap = () => {
         console.log('Google Maps API script loaded successfully');
       };
+      
       script.onerror = () => {
         console.error('Google Maps APIの読み込みに失敗しました');
       };
@@ -182,98 +134,117 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 
   // マップの初期化（Google Maps APIとmapElementが利用可能になったら実行）
   useEffect(() => {
-    console.log('Map initialization useEffect triggered', { 
-      google: !!window.google, 
-      googleMaps: !!(window.google && window.google.maps), 
-      mapElement: !!mapElement 
-    });
-    
-    const checkAndInitialize = () => {
-      if (window.google && window.google.maps && mapElement) {
-        console.log('Initializing map - both Google Maps API and mapElement are available');
-        initializeMap();
-      } else {
-        console.log('Waiting for dependencies:', { 
-          google: !!window.google, 
-          googleMaps: !!(window.google && window.google.maps), 
-          mapElement: !!mapElement 
+    const initializeMap = () => {
+      // DOM要素の存在確認を強化
+      if (!mapElement || !window.google || !window.google.maps || map) {
+        return;
+      }
+
+      // DOM要素が実際にレンダリングされているか確認
+      if (!mapElement.offsetParent && !mapElement.getBoundingClientRect().width) {
+        // 要素がまだレンダリングされていない場合は少し待つ
+        setTimeout(initializeMap, 100);
+        return;
+      }
+
+      const center = userLocation || { lat: 35.6762, lng: 139.6503 }; // デフォルト: 東京
+
+      try {
+        const mapInstance = new window.google.maps.Map(mapElement, {
+          center,
+          zoom: 13,
+          styles: [
+            {
+              featureType: "poi",
+              elementType: "labels",
+              stylers: [{ visibility: "off" }]
+            }
+          ]
         });
-        // まだ準備ができていない場合は少し待ってから再試行
-        setTimeout(checkAndInitialize, 100);
+
+        setMap(mapInstance);
+
+        // マーカーをクリア
+        if (window.markers) {
+          window.markers.forEach(marker => marker.setMap(null));
+        }
+        window.markers = [];
+
+        // フィルタリングされたスポットにマーカーを追加
+        filteredSpots.forEach(spot => {
+          const marker = new window.google.maps.Marker({
+            position: { lat: spot.lat, lng: spot.lng },
+            map: mapInstance,
+            title: spot.name,
+            icon: {
+              url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#FF6B6B" stroke="#fff" stroke-width="2"/>
+                  <path d="M8 12h8M12 8v8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              `),
+              scaledSize: new window.google.maps.Size(24, 24),
+              anchor: new window.google.maps.Point(12, 12)
+            }
+          });
+
+          marker.addListener("click", () => {
+            handleSpotSelect(spot);
+          });
+
+          if (window.markers) {
+            window.markers.push(marker);
+          }
+        });
+      } catch (error) {
+        console.error('マップ初期化エラー:', error);
       }
     };
 
-    checkAndInitialize();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapElement]);
-
-  // マップ初期化関数
-  const initializeMap = useCallback(() => {
-    console.log('initializeMap called', { mapElement, google: !!window.google });
-    if (!mapElement || !window.google) {
-      console.log('Map initialization failed: missing mapElement or Google Maps API');
-      return;
+    // Google Maps APIとmapElementが利用可能になったら初期化
+    if (window.google && window.google.maps && mapElement && !map) {
+      // 少し遅延させてから初期化
+      setTimeout(initializeMap, 100);
     }
-
-    const center = userLocation || { lat: 35.6762, lng: 139.6503 }; // デフォルト: 東京
-    console.log('Initializing map with center:', center);
-
-    const mapInstance = new window.google.maps.Map(mapElement, {
-      center,
-      zoom: 13,
-      styles: [
-        {
-          featureType: "poi",
-          elementType: "labels",
-          stylers: [{ visibility: "off" }]
-        }
-      ]
-    });
-
-    console.log('Map instance created:', mapInstance);
-    setMap(mapInstance);
-
-    // マーカーをクリア
-    if (window.markers) {
-      window.markers.forEach(marker => marker.setMap(null));
-    }
-    window.markers = [];
-
-    // フィルタリングされたスポットにマーカーを追加
-    console.log('Adding markers for spots:', filteredSpots.length);
-    filteredSpots.forEach(spot => {
-      const marker = new window.google.maps.Marker({
-        position: { lat: spot.lat, lng: spot.lng },
-        map: mapInstance,
-        title: spot.name,
-        icon: {
-          url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="10" fill="#FF6B6B" stroke="#fff" stroke-width="2"/>
-              <path d="M8 12h8M12 8v8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          `),
-          scaledSize: new window.google.maps.Size(24, 24),
-          anchor: new window.google.maps.Point(12, 12)
-        }
-      });
-
-      marker.addListener("click", () => {
-        handleSpotSelect(spot);
-      });
-
-      if (window.markers) {
-        window.markers.push(marker);
-      }
-    });
-  }, [filteredSpots, userLocation, handleSpotSelect, mapElement]);
+  }, [mapElement, map, filteredSpots, userLocation, handleSpotSelect]);
 
   // マップ更新
   useEffect(() => {
     if (map && filteredSpots.length > 0) {
-      initializeMap();
+      // マーカーをクリア
+      if (window.markers) {
+        window.markers.forEach(marker => marker.setMap(null));
+      }
+      window.markers = [];
+
+      // 新しいマーカーを追加
+      filteredSpots.forEach(spot => {
+        const marker = new window.google.maps.Marker({
+          position: { lat: spot.lat, lng: spot.lng },
+          map: map,
+          title: spot.name,
+          icon: {
+            url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" fill="#FF6B6B" stroke="#fff" stroke-width="2"/>
+                <path d="M8 12h8M12 8v8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            `),
+            scaledSize: new window.google.maps.Size(24, 24),
+            anchor: new window.google.maps.Point(12, 12)
+          }
+        });
+
+        marker.addListener("click", () => {
+          handleSpotSelect(spot);
+        });
+
+        if (window.markers) {
+          window.markers.push(marker);
+        }
+      });
     }
-  }, [map, filteredSpots, initializeMap]);
+  }, [map, filteredSpots, handleSpotSelect]);
 
   // フォーム変更ハンドラー
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

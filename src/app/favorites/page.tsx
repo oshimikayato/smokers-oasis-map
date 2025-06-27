@@ -2,24 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import SpotList from '../components/SpotList';
-
-interface SmokingSpot {
-  id: number;
-  name: string;
-  lat: number;
-  lng: number;
-  address?: string;
-  description?: string;
-  category: string;
-  tags: string[];
-  distance?: number;
-}
+import { SmokingSpotWithDistance, UserLocation } from "../../types";
 
 const FavoritesPage: React.FC = () => {
   const [favorites, setFavorites] = useState<number[]>([]);
-  const [favoriteSpots, setFavoriteSpots] = useState<SmokingSpot[]>([]);
-  const [allSpots, setAllSpots] = useState<SmokingSpot[]>([]);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [favoriteSpots, setFavoriteSpots] = useState<SmokingSpotWithDistance[]>([]);
+  const [allSpots, setAllSpots] = useState<SmokingSpotWithDistance[]>([]);
+  const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // お気に入りスポットを取得
@@ -63,17 +52,17 @@ const FavoritesPage: React.FC = () => {
 
   // お気に入りスポットをフィルタリング
   useEffect(() => {
-    const filtered = allSpots.filter(spot => favorites.includes(spot.id));
+    const filtered = allSpots.filter(spot => favorites.includes(spot['id']));
     
     // 距離計算とソート
     if (userLocation) {
       const spotsWithDistance = filtered.map(spot => ({
         ...spot,
-        distance: calculateDistance(userLocation.lat, userLocation.lng, spot.lat, spot.lng)
+        distance: calculateDistance(userLocation.lat, userLocation.lng, spot['lat'], spot['lng'])
       })).sort((a, b) => (a.distance || 0) - (b.distance || 0));
       setFavoriteSpots(spotsWithDistance);
     } else {
-      setFavoriteSpots(filtered.sort((a, b) => a.name.localeCompare(b.name)));
+      setFavoriteSpots(filtered.sort((a, b) => a['name'].localeCompare(b['name'])));
     }
   }, [allSpots, favorites, userLocation]);
 
@@ -88,7 +77,7 @@ const FavoritesPage: React.FC = () => {
     }
   };
 
-  const handleSelectSpot = (spot: SmokingSpot) => {
+  const handleSelectSpot = (spot: SmokingSpotWithDistance) => {
     // スポット詳細ページに遷移（将来的に実装）
     console.log("スポット選択:", spot);
   };
@@ -195,7 +184,7 @@ const FavoritesPage: React.FC = () => {
                   <div className="ml-3">
                     <p className="text-sm font-medium text-gray-600">カテゴリ</p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {new Set(favoriteSpots.map(spot => spot.category)).size}
+                      {new Set(favoriteSpots.map(spot => spot['category'])).size}
                     </p>
                   </div>
                 </div>

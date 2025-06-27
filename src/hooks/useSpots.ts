@@ -37,9 +37,9 @@ export function useSpots() {
     setLocationError(null);
 
     const options = {
-      enableHighAccuracy: true, // 高精度な位置情報を要求
-      timeout: 10000, // 10秒でタイムアウト
-      maximumAge: 300000 // 5分以内のキャッシュされた位置情報を使用
+      enableHighAccuracy: false, // 高精度を無効にしてタイムアウトを防ぐ
+      timeout: 30000, // 30秒に延長
+      maximumAge: 600000 // 10分以内のキャッシュされた位置情報を使用
     };
 
     const successCallback = (position: GeolocationPosition) => {
@@ -67,7 +67,7 @@ export function useSpots() {
           errorMessage = "位置情報を取得できませんでした。";
           break;
         case error.TIMEOUT:
-          errorMessage = "位置情報の取得がタイムアウトしました。";
+          errorMessage = "位置情報の取得がタイムアウトしました。ネットワーク環境を確認してください。";
           break;
         default:
           errorMessage = "位置情報の取得中にエラーが発生しました。";
@@ -85,9 +85,9 @@ export function useSpots() {
     if (!navigator.geolocation) return;
 
     const options = {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 60000 // 1分以内のキャッシュ
+      enableHighAccuracy: false, // 高精度を無効にしてタイムアウトを防ぐ
+      timeout: 30000, // 30秒に延長
+      maximumAge: 300000 // 5分以内のキャッシュ
     };
 
     const watchId = navigator.geolocation.watchPosition(
@@ -103,6 +103,7 @@ export function useSpots() {
       },
       (error) => {
         console.error('位置情報監視エラー:', error);
+        // 監視エラーは致命的ではないので、エラーメッセージは設定しない
       },
       options
     );
@@ -114,15 +115,15 @@ export function useSpots() {
   useEffect(() => {
     getUserLocation();
     
-    // 位置情報の監視を開始（オプション）
-    const watchId = startLocationWatching();
+    // 位置情報の監視は無効化（タイムアウトエラーを防ぐため）
+    // const watchId = startLocationWatching();
     
-    return () => {
-      if (watchId) {
-        navigator.geolocation.clearWatch(watchId);
-      }
-    };
-  }, [getUserLocation, startLocationWatching]);
+    // return () => {
+    //   if (watchId) {
+    //     navigator.geolocation.clearWatch(watchId);
+    //   }
+    // };
+  }, [getUserLocation]);
 
   // APIから喫煙所データを取得
   useEffect(() => {

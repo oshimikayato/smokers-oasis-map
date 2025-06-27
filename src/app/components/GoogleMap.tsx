@@ -6,6 +6,7 @@ import LoadingSkeleton from "./LoadingSkeleton";
 import ErrorMessage from "./ErrorMessage";
 import { useSpots } from "@/hooks/useSpots";
 import { SmokingSpot, Feedback, FeedbackForm, PhotoForm } from "@/types";
+import ShareSpot from "./ShareSpot";
 
 // Google Maps APIの型定義
 declare global {
@@ -45,6 +46,8 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     isLoading,
     error,
     userLocation,
+    locationError,
+    isLocationLoading,
     search,
     setSearch,
     categoryFilter,
@@ -430,6 +433,9 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
             setSortBy={setSortBy}
             resetFilters={resetFilters}
             userLocation={userLocation}
+            getUserLocation={getUserLocation}
+            locationError={locationError}
+            isLocationLoading={isLocationLoading}
           />
         )}
         <LoadingSkeleton type="map" />
@@ -453,6 +459,9 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
             setSortBy={setSortBy}
             resetFilters={resetFilters}
             userLocation={userLocation}
+            getUserLocation={getUserLocation}
+            locationError={locationError}
+            isLocationLoading={isLocationLoading}
           />
         )}
         <ErrorMessage 
@@ -481,6 +490,9 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
           setSortBy={setSortBy}
           resetFilters={resetFilters}
           userLocation={userLocation}
+          getUserLocation={getUserLocation}
+          locationError={locationError}
+          isLocationLoading={isLocationLoading}
         />
       )}
 
@@ -566,6 +578,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
                 >
                   写真追加
                 </button>
+                <ShareSpot spotName={selectedSpot.name} spotId={selectedSpot.id} />
               </div>
 
               {/* 信頼度スコア */}

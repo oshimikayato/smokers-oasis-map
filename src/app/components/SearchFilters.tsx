@@ -1,19 +1,23 @@
 "use client";
 import React, { useState } from 'react';
+import { SortOption, UserLocation } from '@/types';
 
 interface SearchFiltersProps {
   search: string;
-  setSearch: (value: string) => void;
+  setSearch: (search: string) => void;
   categoryFilter: string;
-  setCategoryFilter: (value: string) => void;
+  setCategoryFilter: (category: string) => void;
   tagFilters: string[];
   setTagFilters: (value: string[] | ((prev: string[]) => string[])) => void;
-  sortBy: "name" | "distance";
-  setSortBy: (value: "name" | "distance") => void;
+  sortBy: SortOption;
+  setSortBy: (value: SortOption) => void;
   resetFilters: () => void;
   filteredCount?: number;
   totalCount?: number;
-  userLocation?: { lat: number; lng: number } | null;
+  userLocation?: UserLocation | null;
+  getUserLocation?: () => void;
+  locationError?: string | null;
+  isLocationLoading?: boolean;
 }
 
 const CATEGORY_OPTIONS = [
@@ -44,7 +48,10 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   resetFilters,
   filteredCount,
   totalCount,
-  userLocation
+  userLocation,
+  getUserLocation,
+  locationError,
+  isLocationLoading
 }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
@@ -109,7 +116,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           
           <select 
             value={sortBy} 
-            onChange={e => setSortBy(e.target.value as "name" | "distance")} 
+            onChange={e => setSortBy(e.target.value as SortOption)} 
             className="px-6 py-3 border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 bg-white/50 text-lg font-medium"
           >
             <option value="name">📝 名前順</option>
@@ -231,6 +238,45 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
             </div>
           </div>
         )}
+
+        {/* 位置情報セクション */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            📍 現在地
+          </label>
+          <div className="flex items-center gap-3">
+            {userLocation ? (
+              <div className="flex-1 p-3 bg-green-50 border border-green-200 rounded-2xl">
+                <p className="text-sm text-green-800">
+                  取得済み: {userLocation.lat.toFixed(6)}, {userLocation.lng.toFixed(6)}
+                </p>
+                {userLocation.accuracy && (
+                  <p className="text-xs text-green-600 mt-1">
+                    精度: ±{Math.round(userLocation.accuracy)}m
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div className="flex-1 p-3 bg-gray-50 border border-gray-200 rounded-2xl">
+                <p className="text-sm text-gray-600">
+                  位置情報を取得中...
+                </p>
+              </div>
+            )}
+            {getUserLocation && (
+              <button
+                onClick={getUserLocation}
+                disabled={isLocationLoading}
+                className="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              >
+                {isLocationLoading ? '取得中...' : '再取得'}
+              </button>
+            )}
+          </div>
+          {locationError && (
+            <p className="text-sm text-red-600 mt-2">{locationError}</p>
+          )}
+        </div>
       </div>
     </div>
   );

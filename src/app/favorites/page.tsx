@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Header from '../components/Header';
 import SpotList from '../components/SpotList';
 import { SmokingSpotWithDistance } from '../../types';
@@ -73,7 +74,7 @@ const FavoritesPage: React.FC = () => {
             <p className="text-gray-500 dark:text-gray-400 mb-6">
               スポットをお気に入りに追加すると、ここに表示されます
             </p>
-            <a
+            <Link
               href="/"
               className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             >
@@ -82,7 +83,7 @@ const FavoritesPage: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
               スポットを探す
-            </a>
+            </Link>
           </div>
         ) : (
           <div className="space-y-6">

@@ -94,11 +94,30 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         return;
       }
 
+      // Google Maps APIが既にロードされているかチェック
+      const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+      if (existingScript) {
+        // 既存のスクリプトがある場合は、ロード完了を待つ
+        const checkGoogleMaps = () => {
+          if (window.google && window.google.maps) {
+            initializeMap();
+          } else {
+            setTimeout(checkGoogleMaps, 100);
+          }
+        };
+        checkGoogleMaps();
+        return;
+      }
+
+      // 新しいスクリプトをロード
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env['NEXT_PUBLIC_GOOGLE_MAPS_API_KEY'] || ''}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env['NEXT_PUBLIC_GOOGLE_MAPS_API_KEY'] || ''}&libraries=places&loading=async`;
       script.async = true;
       script.defer = true;
       script.onload = initializeMap;
+      script.onerror = () => {
+        console.error('Google Maps APIの読み込みに失敗しました');
+      };
       document.head.appendChild(script);
     };
 

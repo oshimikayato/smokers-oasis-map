@@ -102,6 +102,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     if (mapRef.current) {
       console.log('Setting mapElement to:', mapRef.current);
       setMapElement(mapRef.current);
+      return undefined; // 明示的にundefinedを返す
     } else {
       console.log('mapRef.current is null, retrying...');
       // mapRefがnullの場合は少し待ってから再試行

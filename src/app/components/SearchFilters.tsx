@@ -47,16 +47,6 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   userLocation
 }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [debouncedSearch, setDebouncedSearch] = useState(search);
-
-  // 検索のデバウンス処理
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [search]);
 
   const handleTagToggle = (tag: string) => {
     setTagFilters((prev: string[]) => 

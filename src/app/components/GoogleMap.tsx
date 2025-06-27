@@ -28,6 +28,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapElement, setMapElement] = useState<HTMLDivElement | null>(null);
+  const [isMapContainerReady, setIsMapContainerReady] = useState(false);
   const [selectedSpot, setSelectedSpot] = useState<SmokingSpot | null>(null);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [feedbackForm, setFeedbackForm] = useState<FeedbackForm>({ found: undefined, rating: 0, comment: "", reportType: "" });
@@ -88,8 +89,8 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   }, [onSpotSelect]);
 
   // mapRefの変更を監視してmapElementを更新
-  useLayoutEffect(() => {
-    console.log('mapRef useLayoutEffect triggered', { mapRef: mapRef.current });
+  useEffect(() => {
+    console.log('mapRef useEffect triggered', { mapRef: mapRef.current });
     
     // DOM要素の存在確認
     const mapContainer = document.getElementById('google-map-container');
@@ -102,7 +103,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     if (mapRef.current) {
       console.log('Setting mapElement to:', mapRef.current);
       setMapElement(mapRef.current);
-      return undefined; // 明示的にundefinedを返す
+      setIsMapContainerReady(true);
     } else {
       console.log('mapRef.current is null, retrying...');
       // mapRefがnullの場合は少し待ってから再試行
@@ -110,13 +111,14 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         if (mapRef.current) {
           console.log('Setting mapElement to (retry):', mapRef.current);
           setMapElement(mapRef.current);
+          setIsMapContainerReady(true);
         } else {
           console.log('mapRef.current is still null after retry');
         }
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, []); // 依存配列を空にする
 
   // Google Maps APIの読み込み
   useEffect(() => {
@@ -407,7 +409,13 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
               ref={mapRef} 
               id="google-map-container"
               className="w-full h-96 rounded-lg" 
+              style={{ minHeight: '384px' }}
             />
+            {!isMapContainerReady && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
+                <p className="text-gray-500">マップを読み込み中...</p>
+              </div>
+            )}
           </div>
         </div>
 

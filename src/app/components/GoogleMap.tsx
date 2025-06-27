@@ -100,26 +100,28 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       mapRefCurrent: mapRef.current 
     });
     
-    if (mapRef.current) {
-      console.log('Setting mapElement to:', mapRef.current);
-      setMapElement(mapRef.current);
-      setIsMapContainerReady(true);
-      return undefined; // 明示的にundefinedを返す
-    } else {
+    const checkAndSetMapElement = () => {
+      if (mapRef.current) {
+        console.log('Setting mapElement to:', mapRef.current);
+        setMapElement(mapRef.current);
+        setIsMapContainerReady(true);
+        return true;
+      }
+      return false;
+    };
+
+    // 最初のチェック
+    if (!checkAndSetMapElement()) {
       console.log('mapRef.current is null, retrying...');
       // mapRefがnullの場合は少し待ってから再試行
       const timer = setTimeout(() => {
-        if (mapRef.current) {
-          console.log('Setting mapElement to (retry):', mapRef.current);
-          setMapElement(mapRef.current);
-          setIsMapContainerReady(true);
-        } else {
+        if (!checkAndSetMapElement()) {
           console.log('mapRef.current is still null after retry');
         }
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, []); // 依存配列を空にする
+  }, [mapRef]); // mapRefの変更を監視
 
   // Google Maps APIの読み込み
   useEffect(() => {
@@ -405,7 +407,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* マップ */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="bg-white rounded-lg shadow-md p-4 relative">
             <div 
               ref={mapRef} 
               id="google-map-container"

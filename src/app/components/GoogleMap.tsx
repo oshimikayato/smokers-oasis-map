@@ -525,9 +525,8 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
           <div className="lg:col-span-1">
             <SpotList
               spots={filteredSpots}
-              onSelectSpot={handleSelectSpot}
-              favorites={favorites}
-              onToggleFavorite={toggleFavorite}
+              onSpotSelect={handleSelectSpot}
+              selectedSpot={selectedSpot}
               userLocation={userLocation}
             />
           </div>

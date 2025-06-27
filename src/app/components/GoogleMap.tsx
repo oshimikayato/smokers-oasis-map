@@ -27,6 +27,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   onSpotSelect
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
+  const [mapElement, setMapElement] = useState<HTMLDivElement | null>(null);
   const [selectedSpot, setSelectedSpot] = useState<SmokingSpot | null>(null);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [feedbackForm, setFeedbackForm] = useState<FeedbackForm>({ found: undefined, rating: 0, comment: "", reportType: "" });
@@ -86,6 +87,13 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     }
   }, [onSpotSelect]);
 
+  // mapRefの変更を監視してmapElementを更新
+  useEffect(() => {
+    if (mapRef.current) {
+      setMapElement(mapRef.current);
+    }
+  }, [mapRef.current]);
+
   // Google Maps APIの読み込み
   useEffect(() => {
     const loadGoogleMapsAPI = () => {
@@ -115,11 +123,11 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     }
   }, []);
 
-  // マップの初期化（Google Maps APIとmapRefが利用可能になったら実行）
+  // マップの初期化（Google Maps APIとmapElementが利用可能になったら実行）
   useEffect(() => {
     const checkAndInitialize = () => {
-      if (window.google && window.google.maps && mapRef.current) {
-        console.log('Initializing map - both Google Maps API and mapRef are available');
+      if (window.google && window.google.maps && mapElement) {
+        console.log('Initializing map - both Google Maps API and mapElement are available');
         initializeMap();
       } else {
         // まだ準備ができていない場合は少し待ってから再試行
@@ -129,20 +137,20 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 
     checkAndInitialize();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [mapElement]);
 
   // マップ初期化関数
   const initializeMap = useCallback(() => {
-    console.log('initializeMap called', { mapRef: mapRef.current, google: !!window.google });
-    if (!mapRef.current || !window.google) {
-      console.log('Map initialization failed: missing mapRef or Google Maps API');
+    console.log('initializeMap called', { mapElement, google: !!window.google });
+    if (!mapElement || !window.google) {
+      console.log('Map initialization failed: missing mapElement or Google Maps API');
       return;
     }
 
     const center = userLocation || { lat: 35.6762, lng: 139.6503 }; // デフォルト: 東京
     console.log('Initializing map with center:', center);
 
-    const mapInstance = new window.google.maps.Map(mapRef.current, {
+    const mapInstance = new window.google.maps.Map(mapElement, {
       center,
       zoom: 13,
       styles: [
@@ -190,7 +198,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         window.markers.push(marker);
       }
     });
-  }, [filteredSpots, userLocation, handleSpotSelect]);
+  }, [filteredSpots, userLocation, handleSpotSelect, mapElement]);
 
   // マップ更新
   useEffect(() => {

@@ -59,7 +59,7 @@ const SpotList: React.FC<SpotListProps> = ({
           </div>
         ) : (
           <div className="divide-y divide-gray-200">
-            {spots.map((spot, index) => (
+            {spots.map(spot => (
               <div
                 key={spot.id}
                 className="p-4 hover:bg-gray-50 transition-colors cursor-pointer focus:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -101,7 +101,7 @@ const SpotList: React.FC<SpotListProps> = ({
                     )}
                     
                     <div className="flex flex-wrap gap-1" role="group" aria-label="タグ">
-                      {typeof spot.tags === 'string' && spot.tags.split(',').slice(0, 3).map((tag, tagIndex) => (
+                      {typeof spot.tags === 'string' && spot.tags.split(',').slice(0, 3).map((tag: string, tagIndex: number) => (
                         <span
                           key={tagIndex}
                           className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"

@@ -19,14 +19,12 @@ interface GoogleMapProps {
   showSearchFilters?: boolean;
   showSpotList?: boolean;
   onSpotSelect?: (spot: SmokingSpot) => void;
-  selectedSpot?: SmokingSpot | null;
 }
 
 const GoogleMap: React.FC<GoogleMapProps> = ({
   showSearchFilters = true,
   showSpotList = false,
-  onSpotSelect,
-  selectedSpot: externalSelectedSpot
+  onSpotSelect
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [selectedSpot, setSelectedSpot] = useState<SmokingSpot | null>(null);
@@ -109,6 +107,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
     if (typeof window !== "undefined") {
       loadGoogleMapsAPI();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // マップ初期化関数
@@ -362,10 +361,9 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
           <div className="lg:col-span-1">
             <SpotList
               spots={filteredSpots}
-              onSpotSelect={handleSelectSpot}
-              selectedSpot={selectedSpot}
+              onSelectSpot={handleSelectSpot}
               favorites={favorites}
-              toggleFavorite={toggleFavorite}
+              onToggleFavorite={toggleFavorite}
               userLocation={userLocation}
             />
           </div>

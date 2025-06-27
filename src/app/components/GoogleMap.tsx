@@ -89,7 +89,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   // Google Maps APIの読み込みと初期化
   useEffect(() => {
     const loadGoogleMapsAPI = () => {
-      if (window.google && window.google.maps) {
+      if (window.google && window.google.maps && mapRef.current) {
         initializeMap();
         return;
       }
@@ -99,8 +99,11 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       if (existingScript) {
         // 既存のスクリプトがある場合は、ロード完了を待つ
         const checkGoogleMaps = () => {
-          if (window.google && window.google.maps) {
+          if (window.google && window.google.maps && mapRef.current) {
             initializeMap();
+          } else if (window.google && window.google.maps) {
+            // Google Maps APIはロード済みだが、mapRefがまだ利用できない場合は少し待つ
+            setTimeout(checkGoogleMaps, 100);
           } else {
             setTimeout(checkGoogleMaps, 100);
           }
@@ -114,7 +117,17 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env['NEXT_PUBLIC_GOOGLE_MAPS_API_KEY'] || ''}&libraries=places`;
       script.async = true;
       script.defer = true;
-      script.onload = initializeMap;
+      script.onload = () => {
+        // スクリプトロード後、mapRefが利用可能になるまで待つ
+        const checkMapRef = () => {
+          if (mapRef.current) {
+            initializeMap();
+          } else {
+            setTimeout(checkMapRef, 100);
+          }
+        };
+        checkMapRef();
+      };
       script.onerror = () => {
         console.error('Google Maps APIの読み込みに失敗しました');
       };

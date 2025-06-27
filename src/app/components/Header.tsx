@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,6 +13,7 @@ const Header: React.FC = () => {
     totalPhotos: 0,
     totalFeedbacks: 0
   });
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <>
@@ -38,21 +40,21 @@ const Header: React.FC = () => {
 
             {/* デスクトップナビゲーション */}
             <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-gray-700 hover:text-blue-600 transition-all duration-300 font-semibold hover:scale-105">
+              <Link href="/" className="text-gray-700 hover:text-blue-600 transition-colors">
                 ホーム
               </Link>
-              <Link href="/favorites" className="text-gray-700 hover:text-blue-600 transition-all duration-300 font-semibold hover:scale-105">
+              <Link href="/favorites" className="text-gray-700 hover:text-blue-600 transition-colors">
                 お気に入り
               </Link>
-              <Link href="/quit-challenge" className="text-gray-700 hover:text-blue-600 transition-all duration-300 font-semibold hover:scale-105">
+              <Link href="/history" className="text-gray-700 hover:text-blue-600 transition-colors">
+                履歴
+              </Link>
+              <Link href="/stats" className="text-gray-700 hover:text-blue-600 transition-colors">
+                統計
+              </Link>
+              <Link href="/quit-challenge" className="text-gray-700 hover:text-blue-600 transition-colors">
                 禁煙チャレンジ
               </Link>
-              <a href="#" className="text-gray-700 hover:text-blue-600 transition-all duration-300 font-semibold hover:scale-105">
-                新着情報
-              </a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 transition-all duration-300 font-semibold hover:scale-105">
-                ヘルプ
-              </a>
             </nav>
 
             {/* アクションボタン */}
@@ -72,6 +74,21 @@ const Header: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 <span>新規登録</span>
+              </button>
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-all duration-200"
+                aria-label={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
+              >
+                {theme === 'dark' ? (
+                  <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                  </svg>
+                )}
               </button>
             </div>
 
@@ -105,15 +122,12 @@ const Header: React.FC = () => {
                 <Link href="/favorites" className="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-300 font-semibold">
                   お気に入り
                 </Link>
+                <Link href="/history" className="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-300 font-semibold">
+                  履歴
+                </Link>
                 <Link href="/quit-challenge" className="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-300 font-semibold">
                   禁煙チャレンジ
                 </Link>
-                <a href="#" className="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-300 font-semibold">
-                  新着情報
-                </a>
-                <a href="#" className="block px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-300 font-semibold">
-                  ヘルプ
-                </a>
                 <div className="pt-4 space-y-3 border-t border-gray-200">
                   <Link 
                     href="/stats"

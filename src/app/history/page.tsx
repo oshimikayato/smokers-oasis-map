@@ -3,10 +3,10 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import SpotList from '../components/SpotList';
 import { SmokingSpotWithDistance } from '../../types';
-import { useFavorites } from '@/contexts/FavoritesContext';
+import { useHistory } from '@/contexts/HistoryContext';
 
-const FavoritesPage: React.FC = () => {
-  const { favorites, clearFavorites } = useFavorites();
+const HistoryPage: React.FC = () => {
+  const { history, clearHistory, removeFromHistory } = useHistory();
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedSpot, setSelectedSpot] = useState<SmokingSpotWithDistance | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,10 +40,20 @@ const FavoritesPage: React.FC = () => {
     setSelectedSpot(spot);
   };
 
-  const handleClearFavorites = () => {
-    if (confirm('すべてのお気に入りを削除しますか？')) {
-      clearFavorites();
+  const handleClearHistory = () => {
+    if (confirm('すべての履歴を削除しますか？')) {
+      clearHistory();
     }
+  };
+
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleDateString('ja-JP', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
@@ -53,25 +63,25 @@ const FavoritesPage: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            ❤️ お気に入りスポット
+            📚 閲覧履歴
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            お気に入りに登録したスポットを管理できます
+            最近閲覧したスポットの履歴を確認できます
           </p>
         </div>
 
-        {favorites.length === 0 ? (
+        {history.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
               <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-              お気に入りがありません
+              履歴がありません
             </h3>
             <p className="text-gray-500 dark:text-gray-400 mb-6">
-              スポットをお気に入りに追加すると、ここに表示されます
+              スポットを閲覧すると、ここに履歴が表示されます
             </p>
             <a
               href="/"
@@ -92,12 +102,12 @@ const FavoritesPage: React.FC = () => {
                 <div className="flex items-center">
                   <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                     <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">お気に入り数</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{favorites.length}</p>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">閲覧数</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{history.length}</p>
                   </div>
                 </div>
               </div>
@@ -111,9 +121,9 @@ const FavoritesPage: React.FC = () => {
                     </svg>
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">カテゴリ数</p>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">ユニークスポット</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                      {new Set(favorites.map(f => f.category)).size}
+                      {new Set(history.map(h => h.id)).size}
                     </p>
                   </div>
                 </div>
@@ -127,10 +137,10 @@ const FavoritesPage: React.FC = () => {
                     </svg>
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">最近追加</p>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">最近閲覧</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                      {favorites.length > 0 ? 
-                        new Date(favorites[favorites.length - 1]?.createdAt || new Date()).toLocaleDateString('ja-JP') : 
+                      {history.length > 0 ? 
+                        formatDate(history[0]?.createdAt || new Date()) : 
                         'なし'
                       }
                     </p>
@@ -142,19 +152,19 @@ const FavoritesPage: React.FC = () => {
             {/* アクションボタン */}
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                お気に入りスポット ({favorites.length}件)
+                閲覧履歴 ({history.length}件)
               </h2>
               <button
-                onClick={handleClearFavorites}
+                onClick={handleClearHistory}
                 className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
               >
-                すべて削除
+                履歴をクリア
               </button>
             </div>
 
             {/* スポットリスト */}
             <SpotList
-              spots={favorites}
+              spots={history}
               onSpotSelect={handleSpotSelect}
               selectedSpot={selectedSpot}
               userLocation={userLocation}
@@ -166,4 +176,4 @@ const FavoritesPage: React.FC = () => {
   );
 };
 
-export default FavoritesPage; 
+export default HistoryPage; 

@@ -1,183 +1,200 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import { SmokingSpotWithDistance } from '@/types';
+import { useFavorites } from '@/contexts/FavoritesContext';
+import { useHistory } from '@/contexts/HistoryContext';
+import RouteGuide from './RouteGuide';
+import ReviewSystem from './ReviewSystem';
 
 interface SpotListProps {
   spots: SmokingSpotWithDistance[];
-  favorites: number[];
-  onToggleFavorite: (spotId: number) => void;
-  onSelectSpot: (spot: SmokingSpotWithDistance) => void;
+  onSpotSelect: (spot: SmokingSpotWithDistance) => void;
+  selectedSpot: SmokingSpotWithDistance | null;
   userLocation: { lat: number; lng: number } | null;
-  selectedSpotId?: number | null;
 }
 
-const SpotList: React.FC<SpotListProps> = ({
-  spots,
-  favorites,
-  onToggleFavorite,
-  onSelectSpot,
-  userLocation,
-  selectedSpotId
+const SpotList: React.FC<SpotListProps> = ({ 
+  spots, 
+  onSpotSelect, 
+  selectedSpot,
+  userLocation 
 }) => {
-  const formatDistance = (distance?: number) => {
-    if (!distance) return null;
-    if (distance < 1) {
-      return `${Math.round(distance * 1000)}m`;
-    }
-    return `${distance.toFixed(1)}km`;
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const { addToHistory } = useHistory();
+  const [showDetails, setShowDetails] = useState<number | null>(null);
+  const [routeGuideSpot, setRouteGuideSpot] = useState<SmokingSpotWithDistance | null>(null);
+  const [reviewSpot, setReviewSpot] = useState<SmokingSpotWithDistance | null>(null);
+
+  const calculateDistance = (spot: SmokingSpotWithDistance) => {
+    if (!userLocation) return null;
+    
+    const R = 6371; // 地球の半径（km）
+    const dLat = (spot.lat - userLocation.lat) * Math.PI / 180;
+    const dLon = (spot.lng - userLocation.lng) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(userLocation.lat * Math.PI / 180) * Math.cos(spot.lat * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distance = R * c;
+    
+    return distance < 1 ? `${Math.round(distance * 1000)}m` : `${distance.toFixed(1)}km`;
   };
 
-  const getCategoryIcon = (category: string) => {
-    return category === "喫煙所" ? "🚬" : "🍽️";
+  const getCategoryIcon = (category: string): string => {
+    const icons: { [key: string]: string } = {
+      'カフェ': '☕',
+      'レストラン': '🍽️',
+      'コンビニ': '🏪',
+      '駅': '🚉',
+      '公園': '🌳',
+      '商業施設': '🏬',
+      'その他': '📍'
+    };
+    return icons[category] || '📍';
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent, spot: SmokingSpotWithDistance) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onSelectSpot(spot);
-    }
+  const handleSpotSelect = (spot: SmokingSpotWithDistance) => {
+    addToHistory(spot);
+    onSpotSelect(spot);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden" role="region" aria-label="喫煙所リスト">
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">
-          📍 スポット一覧 ({spots.length}件)
-        </h3>
-        {userLocation && (
-          <p className="text-sm text-gray-600 mt-1">
-            現在地からの距離で表示中
-          </p>
-        )}
-      </div>
-      
-      <div className="max-h-96 overflow-y-auto" role="listbox" aria-label="喫煙所の一覧">
-        {spots.length === 0 ? (
-          <div className="p-6 text-center text-gray-500" role="status" aria-live="polite">
-            <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <p>条件に一致するスポットが見つかりません</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-200">
-            {spots.map(spot => {
-              const isSelected = selectedSpotId === spot['id'];
-              return (
-                <div
-                  key={spot['id']}
-                  className={`p-4 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    isSelected 
-                      ? 'bg-blue-50 border-l-4 border-blue-500 shadow-md' 
-                      : 'hover:bg-gray-50 focus:bg-blue-50'
-                  }`}
-                  onClick={() => onSelectSpot(spot)}
-                  onKeyDown={(e) => handleKeyDown(e, spot)}
-                  tabIndex={0}
-                  role="option"
-                  aria-selected={isSelected}
-                  aria-label={`${spot['name']}、${spot['category']}、${spot['address'] || '住所不明'}`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-lg" aria-hidden="true">{getCategoryIcon(spot['category'])}</span>
-                        <h4 className={`text-sm font-medium truncate ${
-                          isSelected ? 'text-blue-900' : 'text-gray-900'
-                        }`}>
-                          {spot['name']}
-                        </h4>
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          isSelected 
-                            ? 'bg-blue-100 text-blue-800' 
-                            : 'text-gray-500 bg-gray-100'
-                        }`}>
-                          {spot['category']}
-                        </span>
-                        {isSelected && (
-                          <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full">
-                            選択中
-                          </span>
-                        )}
-                      </div>
-                      
-                      {spot['address'] && (
-                        <p className="text-xs text-gray-600 mb-2 truncate">
-                          <span aria-hidden="true">📍</span> {spot['address']}
-                        </p>
-                      )}
-                      
-                      {spot['distance'] && userLocation && (
-                        <p className="text-xs text-blue-600 font-medium mb-2">
-                          <span aria-hidden="true">📏</span> {formatDistance(spot['distance'])}
-                        </p>
-                      )}
-                      
-                      {spot['description'] && (
-                        <p className="text-xs text-gray-600 mb-2 line-clamp-2">
-                          {spot['description']}
-                        </p>
-                      )}
-                      
-                      <div className="flex flex-wrap gap-1" role="group" aria-label="タグ">
-                        {typeof spot['tags'] === 'string' && spot['tags'].split(',').slice(0, 3).map((tag: string, tagIndex: number) => (
-                          <span
-                            key={tagIndex}
-                            className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"
-                          >
-                            {tag.trim()}
-                          </span>
-                        ))}
-                        {typeof spot['tags'] === 'string' && spot['tags'].split(',').length > 3 && (
-                          <span className="text-xs text-gray-500">
-                            +{spot['tags'].split(',').length - 3}
-                          </span>
-                        )}
+    <>
+      <div className="space-y-4">
+        {spots.map((spot) => {
+          const distance = calculateDistance(spot);
+          const isSelected = selectedSpot?.id === spot.id;
+          const isFav = isFavorite(spot.id);
+          
+          return (
+            <div
+              key={spot.id}
+              className={`card p-6 cursor-pointer transition-all duration-300 hover:shadow-lg ${
+                isSelected 
+                  ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+              }`}
+              onClick={() => handleSpotSelect(spot)}
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-lg" aria-hidden="true">{getCategoryIcon(spot.category)}</span>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      {spot.name}
+                    </h3>
+                    <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full">
+                      {spot.category}
+                    </span>
+                  </div>
+                  
+                  <p className="text-gray-600 dark:text-gray-400 mb-2">
+                    {spot.address || '住所不明'}
+                  </p>
+                  
+                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    {distance && (
+                      <span className="font-medium text-blue-600 dark:text-blue-400">
+                        {distance}
+                      </span>
+                    )}
+                    {spot.tags && (
+                      <span className="text-xs text-gray-400">
+                        {spot.tags}
+                      </span>
+                    )}
+                  </div>
+
+                  {showDetails === spot.id && (
+                    <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <div className="space-y-2 text-sm">
+                        <p><strong>詳細:</strong> {spot.description || '詳細情報なし'}</p>
+                        <p><strong>カテゴリ:</strong> {spot.category}</p>
+                        <p><strong>タグ:</strong> {spot.tags || 'なし'}</p>
                       </div>
                     </div>
-                    
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onToggleFavorite(spot['id']);
-                      }}
-                      onKeyDown={(e) => {
-                        e.stopPropagation();
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          onToggleFavorite(spot['id']);
-                        }
-                      }}
-                      className={`ml-3 p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 ${
-                        favorites.includes(spot['id'])
-                          ? 'text-red-500 hover:text-red-600'
-                          : 'text-gray-400 hover:text-gray-600'
-                      }`}
-                      aria-label={favorites.includes(spot['id']) ? `${spot['name']}をお気に入りから削除` : `${spot['name']}をお気に入りに追加`}
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill={favorites.includes(spot['id']) ? "currentColor" : "none"}
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                        />
-                      </svg>
-                    </button>
-                  </div>
+                  )}
                 </div>
-              );
-            })}
-          </div>
-        )}
+
+                <div className="flex flex-col items-end gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setReviewSpot(spot);
+                    }}
+                    className="p-2 rounded-full bg-yellow-100 text-yellow-600 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 transition-all duration-200"
+                    aria-label="レビューを表示"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setRouteGuideSpot(spot);
+                    }}
+                    className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 transition-all duration-200"
+                    aria-label="経路案内を表示"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" />
+                    </svg>
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(spot);
+                    }}
+                    className={`p-2 rounded-full transition-all duration-200 ${
+                      isFav 
+                        ? 'bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400' 
+                        : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-gray-800 dark:text-gray-500 dark:hover:bg-gray-700'
+                    }`}
+                    aria-label={isFav ? 'お気に入りから削除' : 'お気に入りに追加'}
+                  >
+                    <svg className="w-5 h-5" fill={isFav ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowDetails(showDetails === spot.id ? null : spot.id);
+                    }}
+                    className="p-2 rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:bg-gray-800 dark:text-gray-500 dark:hover:bg-gray-700 transition-all duration-200"
+                    aria-label="詳細を表示"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
-    </div>
+
+      {routeGuideSpot && (
+        <RouteGuide
+          spot={routeGuideSpot}
+          userLocation={userLocation}
+          onClose={() => setRouteGuideSpot(null)}
+        />
+      )}
+
+      {reviewSpot && (
+        <ReviewSystem
+          spot={reviewSpot}
+          onClose={() => setReviewSpot(null)}
+        />
+      )}
+    </>
   );
 };
 

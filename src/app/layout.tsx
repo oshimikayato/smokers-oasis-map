@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import { HistoryProvider } from "@/contexts/HistoryContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,21 +41,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/png" href="/favicon.png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* スキップリンク - アクセシビリティ向上 */}
-        <a href="#main-content" className="skip-link">
-          メインコンテンツにスキップ
-        </a>
-        
-        <div id="main-content">
-          {children}
-        </div>
+        <ThemeProvider>
+          <FavoritesProvider>
+            <HistoryProvider>
+              {/* スキップリンク - アクセシビリティ向上 */}
+              <a href="#main-content" className="skip-link">
+                メインコンテンツにスキップ
+              </a>
+              
+              <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+                {children}
+              </div>
+            </HistoryProvider>
+          </FavoritesProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

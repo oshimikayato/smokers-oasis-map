@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState, useCallback, useLayoutEffect } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import SearchFilters from "./SearchFilters";
 import SpotList from "./SpotList";
 import LoadingSkeleton from "./LoadingSkeleton";
@@ -142,7 +142,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       setMapElement(mapRef.current);
       setIsMapContainerReady(true);
     }
-  }, [mapRef.current, mapElement]);
+  }, [mapElement]);
 
   // Google Maps APIの読み込み
   useEffect(() => {

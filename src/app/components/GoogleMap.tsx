@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useLayoutEffect } from "react";
 import SearchFilters from "./SearchFilters";
 import SpotList from "./SpotList";
 import LoadingSkeleton from "./LoadingSkeleton";
@@ -88,11 +88,32 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   }, [onSpotSelect]);
 
   // mapRefの変更を監視してmapElementを更新
-  useEffect(() => {
-    console.log('mapRef useEffect triggered', { mapRef: mapRef.current });
+  useLayoutEffect(() => {
+    console.log('mapRef useLayoutEffect triggered', { mapRef: mapRef.current });
+    
+    // DOM要素の存在確認
+    const mapContainer = document.getElementById('google-map-container');
+    console.log('DOM element check:', { 
+      mapContainer: !!mapContainer, 
+      mapRef: !!mapRef.current,
+      mapRefCurrent: mapRef.current 
+    });
+    
     if (mapRef.current) {
       console.log('Setting mapElement to:', mapRef.current);
       setMapElement(mapRef.current);
+    } else {
+      console.log('mapRef.current is null, retrying...');
+      // mapRefがnullの場合は少し待ってから再試行
+      const timer = setTimeout(() => {
+        if (mapRef.current) {
+          console.log('Setting mapElement to (retry):', mapRef.current);
+          setMapElement(mapRef.current);
+        } else {
+          console.log('mapRef.current is still null after retry');
+        }
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [mapRef.current]);
 
@@ -381,7 +402,11 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         {/* マップ */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-md p-4">
-            <div ref={mapRef} className="w-full h-96 rounded-lg" />
+            <div 
+              ref={mapRef} 
+              id="google-map-container"
+              className="w-full h-96 rounded-lg" 
+            />
           </div>
         </div>
 

@@ -121,6 +121,8 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       }, 100);
       return () => clearTimeout(timer);
     }
+    
+    return undefined; // 明示的にundefinedを返す
   }, [mapRef]); // mapRefの変更を監視
 
   // Google Maps APIの読み込み

@@ -32,6 +32,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapElement, setMapElement] = useState<HTMLDivElement | null>(null);
   const [isMapContainerReady, setIsMapContainerReady] = useState(false);
+  const [currentLocationMarker, setCurrentLocationMarker] = useState<any>(null);
   const [selectedSpot, setSelectedSpot] = useState<SmokingSpot | null>(null);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [feedbackForm, setFeedbackForm] = useState<FeedbackForm>({ found: undefined, rating: 0, comment: "", reportType: "" });
@@ -191,6 +192,28 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         }
         window.markers = [];
 
+        // 現在位置マーカーを追加
+        if (userLocation) {
+          const currentMarker = new window.google.maps.Marker({
+            position: { lat: userLocation.lat, lng: userLocation.lng },
+            map: mapInstance,
+            title: '現在位置',
+            icon: {
+              url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="16" cy="16" r="14" fill="#4285F4" stroke="#fff" stroke-width="3"/>
+                  <circle cx="16" cy="16" r="6" fill="#fff"/>
+                  <circle cx="16" cy="16" r="3" fill="#4285F4"/>
+                </svg>
+              `),
+              scaledSize: new window.google.maps.Size(32, 32),
+              anchor: new window.google.maps.Point(16, 16)
+            },
+            zIndex: 1000
+          });
+          setCurrentLocationMarker(currentMarker);
+        }
+
         // フィルタリングされたスポットにマーカーを追加
         filteredSpots.forEach(spot => {
           const marker = new window.google.maps.Marker({
@@ -238,6 +261,11 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       }
       window.markers = [];
 
+      // 現在位置マーカーを再表示
+      if (userLocation && currentLocationMarker) {
+        currentLocationMarker.setMap(map);
+      }
+
       // 新しいマーカーを追加
       filteredSpots.forEach(spot => {
         const marker = new window.google.maps.Marker({
@@ -265,7 +293,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         }
       });
     }
-  }, [map, filteredSpots, handleSpotSelect]);
+  }, [map, filteredSpots, handleSpotSelect, userLocation, currentLocationMarker]);
 
   // 選択されたスポットのハイライト表示
   useEffect(() => {
@@ -311,6 +339,36 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
       }
     }
   }, [selectedSpotId, map, filteredSpots]);
+
+  // 現在位置マーカーの更新
+  useEffect(() => {
+    if (map && userLocation) {
+      // 既存の現在位置マーカーを削除
+      if (currentLocationMarker) {
+        currentLocationMarker.setMap(null);
+      }
+
+      // 新しい現在位置マーカーを追加
+      const newCurrentMarker = new window.google.maps.Marker({
+        position: { lat: userLocation.lat, lng: userLocation.lng },
+        map: map,
+        title: '現在位置',
+        icon: {
+          url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="16" cy="16" r="14" fill="#4285F4" stroke="#fff" stroke-width="3"/>
+              <circle cx="16" cy="16" r="6" fill="#fff"/>
+              <circle cx="16" cy="16" r="3" fill="#4285F4"/>
+            </svg>
+          `),
+          scaledSize: new window.google.maps.Size(32, 32),
+          anchor: new window.google.maps.Point(16, 16)
+        },
+        zIndex: 1000
+      });
+      setCurrentLocationMarker(newCurrentMarker);
+    }
+  }, [userLocation, map]);
 
   // フォーム変更ハンドラー
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

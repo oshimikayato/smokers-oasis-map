@@ -145,8 +145,8 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         address,
-        latitude,
-        longitude,
+        lat: latitude,
+        lng: longitude,
         category,
         description: description || '',
         tags: tags || '',

@@ -9,30 +9,12 @@ import "./globals.css";
 export default function Home() {
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
   const [selectedSpot, setSelectedSpot] = useState<any>(null);
-  const [favorites, setFavorites] = useState<number[]>(() => {
-    if (typeof window !== "undefined") {
-      const fav = localStorage.getItem("favorites");
-      return fav ? JSON.parse(fav) : [];
-    }
-    return [];
-  });
 
   // カスタムフックを使用
   const {
     filteredSpots,
     userLocation
   } = useSpots();
-
-  // お気に入り切り替え
-  const toggleFavorite = (spotId: number) => {
-    setFavorites(favs => {
-      const newFavorites = favs.includes(spotId) ? favs.filter(id => id !== spotId) : [...favs, spotId];
-      if (typeof window !== "undefined") {
-        localStorage.setItem("favorites", JSON.stringify(newFavorites));
-      }
-      return newFavorites;
-    });
-  };
 
   // スポット選択ハンドラー
   const handleSpotSelect = (spot: any) => {

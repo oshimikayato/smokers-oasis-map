@@ -7,6 +7,7 @@ import ErrorMessage from "./ErrorMessage";
 import { useSpots } from "@/hooks/useSpots";
 import { SmokingSpot, Feedback, FeedbackForm, PhotoForm } from "@/types";
 import ShareSpot from "./ShareSpot";
+import AddSpotForm from './AddSpotForm';
 
 // Google Maps APIの型定義
 declare global {
@@ -39,6 +40,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
   const [showForm, setShowForm] = useState(false);
   const [map, setMap] = useState<any>(null);
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
+  const [showAddSpotForm, setShowAddSpotForm] = useState(false);
   const [photoForm, setPhotoForm] = useState<PhotoForm>({ url: "", caption: "" });
 
   // カスタムフックを使用
@@ -443,9 +445,62 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
 
   // スポット選択
   const handleSelectSpot = (spot: SmokingSpot) => {
-    handleSpotSelect(spot);
+    setSelectedSpot(spot);
+    if (onSpotSelect) {
+      onSpotSelect(spot);
+    }
+    
+    // マップが存在する場合、選択されたスポットに移動
     if (map) {
-      map.setCenter({ lat: spot.lat, lng: spot.lng });
+      const position = { lat: spot.lat, lng: spot.lng };
+      map.setCenter(position);
+      map.setZoom(16);
+      
+      // 選択されたスポットのマーカーをハイライト
+      if (window.markers) {
+        window.markers.forEach(marker => {
+          const markerPosition = marker.getPosition();
+          if (markerPosition && 
+              markerPosition.lat() === spot.lat && 
+              markerPosition.lng() === spot.lng) {
+            // 選択されたマーカーをハイライト
+            marker.setIcon({
+              url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="12" fill="#FFD700" stroke="#FF6B6B" stroke-width="3"/>
+                  <path d="M8 12h8M12 8v8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              `),
+              scaledSize: new window.google.maps.Size(32, 32),
+              anchor: new window.google.maps.Point(16, 16)
+            });
+          } else {
+            // 他のマーカーを通常表示に戻す
+            marker.setIcon({
+              url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#FF6B6B" stroke="#fff" stroke-width="2"/>
+                  <path d="M8 12h8M12 8v8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              `),
+              scaledSize: new window.google.maps.Size(24, 24),
+              anchor: new window.google.maps.Point(12, 12)
+            });
+          }
+        });
+      }
+    }
+  };
+
+  // スポット追加ハンドラー
+  const handleSpotAdded = (newSpot: SmokingSpot) => {
+    // スポットリストを更新（useSpotsフックで管理されているため、自動的に更新される）
+    console.log('新しいスポットが追加されました:', newSpot);
+    
+    // 追加されたスポットにマップを移動
+    if (map) {
+      const position = { lat: newSpot.lat, lng: newSpot.lng };
+      map.setCenter(position);
       map.setZoom(16);
     }
   };
@@ -533,22 +588,30 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
         {/* マップ */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-md p-4 relative">
-            <div 
-              ref={setMapRef} 
-              id="google-map-container"
-              className="w-full h-96 rounded-lg" 
-              style={{ minHeight: '384px' }}
-            />
-            {!isMapContainerReady && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
-                <p className="text-gray-500">マップを読み込み中...</p>
+            <div className="relative w-full h-96 md:h-[600px] rounded-2xl overflow-hidden">
+              <div
+                ref={setMapRef}
+                className="w-full h-full"
+                style={{ minHeight: '400px' }}
+              />
+              
+              {/* スポット追加ボタン */}
+              <button
+                onClick={() => setShowAddSpotForm(true)}
+                className="absolute top-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-colors z-10"
+                title="新しいスポットを追加"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </button>
+
+              {/* デバッグ情報 */}
+              <div className="mt-2 text-xs text-gray-500">
+                mapRef: {mapRef.current ? 'available' : 'null'}, 
+                mapElement: {mapElement ? 'set' : 'null'}, 
+                isReady: {isMapContainerReady ? 'true' : 'false'}
               </div>
-            )}
-            {/* デバッグ情報 */}
-            <div className="mt-2 text-xs text-gray-500">
-              mapRef: {mapRef.current ? 'available' : 'null'}, 
-              mapElement: {mapElement ? 'set' : 'null'}, 
-              isReady: {isMapContainerReady ? 'true' : 'false'}
             </div>
           </div>
         </div>
@@ -736,6 +799,15 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
             </form>
           </div>
         </div>
+      )}
+
+      {/* スポット追加フォーム */}
+      {showAddSpotForm && (
+        <AddSpotForm
+          onClose={() => setShowAddSpotForm(false)}
+          onSpotAdded={handleSpotAdded}
+          userLocation={userLocation}
+        />
       )}
     </div>
   );

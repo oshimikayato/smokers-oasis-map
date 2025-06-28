@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 // テスト用のフォールバックデータ
@@ -119,47 +119,48 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const data = await req.json();
-    
-    // データベースが利用可能な場合はDBに保存
-    try {
-      const newSpot = await prisma.smokingSpot.create({
-        data: {
-          name: data.name,
-          lat: parseFloat(data.lat),
-          lng: parseFloat(data.lng),
-          address: data.address,
-          description: data.description,
-          category: data.category || "喫煙所",
-          tags: data.tags || "",
-        },
-      });
-      return NextResponse.json(newSpot, { status: 201 });
-    } catch (dbError) {
-      console.log("データベースエラー、フォールバック処理を使用:", dbError);
-      
-      // フォールバック: 新しいIDを生成してメモリに追加
-      const newId = Math.max(...fallbackSpots.map(spot => spot.id)) + 1;
-      const newSpot = {
-        id: newId,
-        name: data.name,
-        lat: parseFloat(data.lat),
-        lng: parseFloat(data.lng),
-        address: data.address || "",
-        description: data.description || "",
-        category: data.category || "喫煙所",
-        tags: data.tags || "",
-      };
-      
-      // 注意: これは一時的な解決策です。サーバー再起動時にデータは失われます
-      fallbackSpots.push(newSpot);
-      
-      return NextResponse.json(newSpot, { status: 201 });
+    const body = await request.json();
+    const { name, address, latitude, longitude, category, description, tags } = body;
+
+    // 必須フィールドのバリデーション
+    if (!name || !address || !latitude || !longitude || !category) {
+      return NextResponse.json(
+        { error: '必須フィールドが不足しています' },
+        { status: 400 }
+      );
     }
+
+    // 座標のバリデーション
+    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+      return NextResponse.json(
+        { error: '無効な座標です' },
+        { status: 400 }
+      );
+    }
+
+    // 新しいスポットを作成
+    const newSpot = await prisma.smokingSpot.create({
+      data: {
+        name,
+        address,
+        latitude,
+        longitude,
+        category,
+        description: description || '',
+        tags: tags || '',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    });
+
+    return NextResponse.json(newSpot, { status: 201 });
   } catch (error) {
-    console.error("POST エラー:", error);
-    return NextResponse.json({ error: "リクエスト処理エラー" }, { status: 500 });
+    console.error('スポット追加エラー:', error);
+    return NextResponse.json(
+      { error: 'スポットの追加に失敗しました' },
+      { status: 500 }
+    );
   }
 }

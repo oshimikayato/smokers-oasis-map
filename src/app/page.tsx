@@ -101,11 +101,9 @@ export default function Home() {
             <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
               <SpotList
                 spots={filteredSpots}
-                onSelectSpot={handleSpotSelect}
-                favorites={favorites}
-                onToggleFavorite={toggleFavorite}
+                onSpotSelect={handleSpotSelect}
+                selectedSpot={selectedSpot}
                 userLocation={userLocation}
-                selectedSpotId={selectedSpot?.id}
               />
             </div>
           )}
@@ -130,11 +128,9 @@ export default function Home() {
             <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
               <SpotList
                 spots={filteredSpots}
-                onSelectSpot={handleSpotSelect}
-                favorites={favorites}
-                onToggleFavorite={toggleFavorite}
+                onSpotSelect={handleSpotSelect}
+                selectedSpot={selectedSpot}
                 userLocation={userLocation}
-                selectedSpotId={selectedSpot?.id}
               />
             </div>
           </div>

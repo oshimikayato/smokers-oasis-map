@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { SmokingSpot, UserLocation, SortOption } from '@/types';
+import { SmokingSpot, UserLocation, SortOption, AdvancedSearchConfig, SearchCondition } from '@/types';
 
 // 距離計算関数（ハバーサイン公式）
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -14,6 +14,48 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * c;
 }
 
+// 高度な検索の条件チェック関数
+function checkSearchCondition(spot: SmokingSpot, condition: SearchCondition): boolean {
+  const { field, operator, value } = condition;
+  const searchValue = value.toLowerCase().trim();
+  
+  if (!searchValue) return true;
+
+  let fieldValue = '';
+  switch (field) {
+    case 'name':
+      fieldValue = spot.name.toLowerCase();
+      break;
+    case 'address':
+      fieldValue = (spot.address || '').toLowerCase();
+      break;
+    case 'description':
+      fieldValue = (spot.description || '').toLowerCase();
+      break;
+    case 'category':
+      fieldValue = spot.category.toLowerCase();
+      break;
+    case 'tags':
+      fieldValue = spot.tags.toLowerCase();
+      break;
+    default:
+      return true;
+  }
+
+  switch (operator) {
+    case 'contains':
+      return fieldValue.includes(searchValue);
+    case 'equals':
+      return fieldValue === searchValue;
+    case 'startsWith':
+      return fieldValue.startsWith(searchValue);
+    case 'endsWith':
+      return fieldValue.endsWith(searchValue);
+    default:
+      return true;
+  }
+}
+
 export function useSpots() {
   const [allSpots, setAllSpots] = useState<SmokingSpot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,6 +67,10 @@ export function useSpots() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [tagFilters, setTagFilters] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("name");
+  const [advancedSearchConfig, setAdvancedSearchConfig] = useState<AdvancedSearchConfig>({
+    groups: [],
+    groupOperator: 'AND'
+  });
 
   // 現在地取得（改善版）
   const getUserLocation = useCallback(() => {
@@ -183,6 +229,36 @@ export function useSpots() {
       );
     }
 
+    // 高度な検索フィルタリング
+    if (advancedSearchConfig.groups.length > 0) {
+      const activeGroups = advancedSearchConfig.groups.filter(group => 
+        group.conditions.some(condition => condition.value.trim() !== '')
+      );
+
+      if (activeGroups.length > 0) {
+        filtered = filtered.filter(spot => {
+          // 各グループの条件をチェック
+          const groupResults = activeGroups.map(group => {
+            const conditionResults = group.conditions
+              .filter(condition => condition.value.trim() !== '')
+              .map(condition => checkSearchCondition(spot, condition));
+
+            if (conditionResults.length === 0) return true;
+
+            // グループ内の条件をAND/ORで結合
+            return group.operator === 'AND' 
+              ? conditionResults.every(result => result)
+              : conditionResults.some(result => result);
+          });
+
+          // グループ間の条件をAND/ORで結合
+          return advancedSearchConfig.groupOperator === 'AND'
+            ? groupResults.every(result => result)
+            : groupResults.some(result => result);
+        });
+      }
+    }
+
     // ソート処理
     if (sortBy === "distance" && userLocation) {
       filtered = filtered.map(spot => ({
@@ -194,7 +270,7 @@ export function useSpots() {
     }
 
     return filtered;
-  }, [allSpots, search, categoryFilter, tagFilters, sortBy, userLocation]);
+  }, [allSpots, search, categoryFilter, tagFilters, sortBy, userLocation, advancedSearchConfig]);
 
   // フィルターリセット
   const resetFilters = useCallback(() => {
@@ -202,6 +278,10 @@ export function useSpots() {
     setCategoryFilter("");
     setTagFilters([]);
     setSortBy("name");
+    setAdvancedSearchConfig({
+      groups: [],
+      groupOperator: 'AND'
+    });
   }, []);
 
   return {
@@ -222,6 +302,8 @@ export function useSpots() {
     setSortBy,
     resetFilters,
     getUserLocation,
-    startLocationWatching
+    startLocationWatching,
+    advancedSearchConfig,
+    setAdvancedSearchConfig
   };
 } 

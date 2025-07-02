@@ -56,5 +56,25 @@ export interface UserLocation {
   timestamp?: number; // タイムスタンプ
 }
 
+// AND/OR検索用の型定義
+export type SearchOperator = 'AND' | 'OR';
+
+export interface SearchCondition {
+  field: 'name' | 'address' | 'description' | 'category' | 'tags';
+  operator: 'contains' | 'equals' | 'startsWith' | 'endsWith';
+  value: string;
+}
+
+export interface SearchGroup {
+  id: string;
+  conditions: SearchCondition[];
+  operator: SearchOperator;
+}
+
+export interface AdvancedSearchConfig {
+  groups: SearchGroup[];
+  groupOperator: SearchOperator;
+}
+
 export type SortOption = "name" | "distance";
 export type ViewMode = "map" | "list"; 

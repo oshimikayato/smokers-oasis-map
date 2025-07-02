@@ -35,6 +35,7 @@ model Feedback {
   rating        Int?          // 1〜5段階評価
   comment       String?
   reportType    String?       // "閉鎖"や"移動"などの修正種別
+  likes         FeedbackLike[]
 }
 
 model Photo {
@@ -100,4 +101,12 @@ model DailyCheck {
   triggers        String?   // カンマ区切りで保存: "ストレス,飲酒,コーヒー"
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+}
+
+model FeedbackLike {
+  id         Int      @id @default(autoincrement())
+  feedback   Feedback @relation(fields: [feedbackId], references: [id])
+  feedbackId Int
+  userId     String
+  createdAt  DateTime @default(now())
 }

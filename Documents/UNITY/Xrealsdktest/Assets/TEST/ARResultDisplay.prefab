@@ -1,0 +1,181 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3122933020775952192
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5619066647524560311}
+  m_Layer: 0
+  m_Name: CardContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5619066647524560311
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3122933020775952192}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3700605721295828392}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6491787525516436219
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3700605721295828392}
+  - component: {fileID: 2186947943593992027}
+  - component: {fileID: 3606095222043950947}
+  - component: {fileID: 8281609430424550631}
+  - component: {fileID: 5006601540346341624}
+  m_Layer: 0
+  m_Name: ARResultDisplay
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3700605721295828392
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6491787525516436219}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5619066647524560311}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2186947943593992027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6491787525516436219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01ac145ef52034145bea46984396360b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentMode: 1
+  arResultContainer: {fileID: 0}
+  arCamera: {fileID: 0}
+  floatingCardDisplay: {fileID: 3606095222043950947}
+  infiniteCarousel: {fileID: 8281609430424550631}
+  timelineCorridorDisplay: {fileID: 5006601540346341624}
+  cardDistance: 2
+  animationDuration: 0.5
+  imageUploader: {fileID: 0}
+--- !u!114 &3606095222043950947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6491787525516436219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4275fbd928ef224bb989abc589e3b43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseDisplay: {fileID: 2186947943593992027}
+  cardPrefab: {fileID: 0}
+  cardContainer: {fileID: 5619066647524560311}
+  imageUploader: {fileID: 0}
+  arcRadius: 2.5
+  arcAngle: 120
+  cardSpacing: 0.4
+  cardScale: 0.3
+  maxVisibleCards: 7
+  fadeInDuration: 0.4
+  fadeInDelay: 0.1
+  hoverScale: 1.3
+  glowColor: {r: 0.3, g: 0.7, b: 1, a: 0.8}
+  glowIntensity: 0.5
+--- !u!114 &8281609430424550631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6491787525516436219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b10ef16caa592c5498c7ce7f12b401a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseDisplay: {fileID: 2186947943593992027}
+  cardContainer: {fileID: 5619066647524560311}
+  imageUploader: {fileID: 0}
+  visibleCards: 5
+  cardWidth: 0.4
+  cardSpacing: 0.1
+  distanceFromCamera: 2
+  depthMultiplier: 0.2
+  rotationMultiplier: 25
+  autoScrollSpeed: 0.3
+  fadeEdge: 0.3
+  autoScrollEnabled: 1
+  dragSensitivity: 2
+  momentumDecay: 0.95
+  minMomentum: 0.01
+  glowColor: {r: 0.3, g: 0.7, b: 1, a: 0.8}
+  enableSlideshow: 0
+  slideshowInterval: 2
+  timeGroupingMinutes: 5
+--- !u!114 &5006601540346341624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6491787525516436219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fd0d9b04cabdeb45a54fe8d7fd54858, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseDisplay: {fileID: 2186947943593992027}
+  corridorContainer: {fileID: 5619066647524560311}
+  imageUploader: {fileID: 0}
+  cardsPerSection: 4
+  sectionSpacing: 0.8
+  sideOffset: 0.7
+  verticalSpacing: 0.35
+  startDistance: 0
+  cardWidth: 0.35
+  cardHeight: 0.45
+  fadeInDuration: 0.6
+  fadeInDelay: 0.1
+  selectedScale: 1.3
+  glowColor: {r: 0.3, g: 0.6, b: 1, a: 0.5}
+  floorLineColor: {r: 0.3, g: 0.5, b: 0.8, a: 0.3}
+  usePlaneDetection: 1
+  planeSearchTimeout: 3
+  cardsPerRow: 2
+  maxVisibleCards: 50
+  cardLoadDistance: 20
+  cardUnloadDistance: 50
+  updateInterval: 0.5

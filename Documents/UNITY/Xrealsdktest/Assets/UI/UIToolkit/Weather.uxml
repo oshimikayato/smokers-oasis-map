@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="Common.uss" />
+    <Style src="Weather.uss" />
+    
+    <!-- Top-Right Weather Widget -->
+    <ui:VisualElement name="weather-widget-container" class="weather-widget">
+        <ui:VisualElement name="weather-widget" class="weather-widget-inner">
+            <ui:Label name="weather-emoji" class="weather-emoji" text="☀️" />
+            <ui:Label name="weather-temp" class="weather-temp" text="15°C" />
+            <ui:Label name="weather-area" class="weather-area" text="東京" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    
+    <!-- Weather Panel Overlay -->
+    <ui:VisualElement name="weather-overlay" class="panel-overlay hidden">
+        <ui:VisualElement name="weather-panel" class="weather-panel">
+            
+            <!-- Header -->
+            <ui:VisualElement class="weather-header">
+                <ui:Label class="weather-title" text="🌤️ 天気予報" />
+                <ui:Button name="weather-close-btn" class="close-btn" text="✕" />
+            </ui:VisualElement>
+            
+            <!-- Current Weather -->
+            <ui:VisualElement class="current-weather">
+                <ui:Label name="current-emoji" class="current-emoji" text="☀️" />
+                <ui:VisualElement class="current-info">
+                    <ui:Label name="current-weather-text" class="current-weather-text" text="晴れ" />
+                    <ui:Label name="current-temp" class="current-temp" text="15°C" />
+                    <ui:Label name="current-area" class="current-area" text="東京都 東京" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Details -->
+            <ui:VisualElement class="weather-details">
+                <ui:VisualElement class="detail-row">
+                    <ui:Label class="detail-label" text="降水確率" />
+                    <ui:Label name="rain-chance" class="detail-value" text="10%" />
+                </ui:VisualElement>
+                <ui:VisualElement class="detail-row">
+                    <ui:Label class="detail-label" text="最高気温" />
+                    <ui:Label name="high-temp" class="detail-value" text="18°C" />
+                </ui:VisualElement>
+                <ui:VisualElement class="detail-row">
+                    <ui:Label class="detail-label" text="最低気温" />
+                    <ui:Label name="low-temp" class="detail-value" text="8°C" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Forecast (Tomorrow) -->
+            <ui:VisualElement class="forecast-section">
+                <ui:Label class="forecast-title" text="明日の天気" />
+                <ui:VisualElement class="forecast-card">
+                    <ui:Label name="tomorrow-emoji" class="forecast-emoji" text="🌥️" />
+                    <ui:Label name="tomorrow-weather" class="forecast-text" text="曇り" />
+                    <ui:Label name="tomorrow-temp" class="forecast-temp" text="12°C / 6°C" />
+                    <ui:Label name="tomorrow-rain" class="forecast-rain" text="降水確率: 30%" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Footer Actions -->
+            <ui:VisualElement class="weather-footer">
+                <ui:Button name="refresh-btn" class="btn btn-primary" text="🔄 更新" />
+                <ui:Button name="region-btn" class="btn" text="🌍 地域変更" />
+            </ui:VisualElement>
+            
+        </ui:VisualElement>
+    </ui:VisualElement>
+    
+    <!-- Region Settings Panel -->
+    <ui:VisualElement name="region-overlay" class="panel-overlay hidden">
+        <ui:VisualElement name="region-panel" class="region-panel">
+            <ui:VisualElement class="weather-header">
+                <ui:Label class="weather-title" text="🌍 地域設定" />
+                <ui:Button name="region-close-btn" class="close-btn" text="✕" />
+            </ui:VisualElement>
+            
+            <ui:VisualElement class="region-list">
+                <ui:Button name="region-tokyo" class="region-btn selected" text="東京" />
+                <ui:Button name="region-osaka" class="region-btn" text="大阪" />
+                <ui:Button name="region-nagoya" class="region-btn" text="名古屋" />
+                <ui:Button name="region-fukuoka" class="region-btn" text="福岡" />
+                <ui:Button name="region-sapporo" class="region-btn" text="札幌" />
+                <ui:Button name="region-sendai" class="region-btn" text="仙台" />
+                <ui:Button name="region-hiroshima" class="region-btn" text="広島" />
+                <ui:Button name="region-yokohama" class="region-btn" text="横浜" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    
+</ui:UXML>

@@ -1,0 +1,113 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1089811347694835131
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 886125110461844486}
+  - component: {fileID: 2450632434073258816}
+  - component: {fileID: 1616008000021006721}
+  m_Layer: 0
+  m_Name: ImageUploaderSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &886125110461844486
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1089811347694835131}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2450632434073258816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1089811347694835131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b987f822051a084fbb35a252429af8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serverUrlBase: http://localhost:5000
+  streamInterval: 2
+  isStreaming: 1
+  showLogByDefault: 0
+  useARGlassCamera: 1
+  debugText: {fileID: 0}
+  debugTextMesh: {fileID: 0}
+  settingsPanel: {fileID: 0}
+  debugPanel: {fileID: 0}
+  logToggleButtonText: {fileID: 0}
+  settingsButton: {fileID: 0}
+  logToggleButton: {fileID: 0}
+  closeSettingsButton: {fileID: 0}
+  setIpButton: {fileID: 0}
+  ipInputField: {fileID: 0}
+  objectIdButton: {fileID: 0}
+  objectResultText: {fileID: 0}
+  objectIdPanel: {fileID: 0}
+  objectNameInput: {fileID: 0}
+  registerObjectButton: {fileID: 0}
+  closeObjectIdPanelButton: {fileID: 0}
+  objectProgressText: {fileID: 0}
+  objectProgressBar: {fileID: 0}
+  isObjectIdMode: 0
+  registrationSelectPanel: {fileID: 0}
+  closeRegistrationSelectButton: {fileID: 0}
+  beaconEnabled: 1
+  isBeaconVisible: 1
+  beaconDistance: 2
+  beaconColor: {r: 0, g: 1, b: 0.5, a: 0.8}
+  selectionCountText: {fileID: 0}
+  registeredListPanel: {fileID: 0}
+  registeredListText: {fileID: 0}
+  closeRegisteredListButton: {fileID: 0}
+--- !u!114 &1616008000021006721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1089811347694835131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b627f1930d3e88f46966d1a5256b915a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectDropdown: {fileID: 0}
+  searchButton: {fileID: 0}
+  cancelButton: {fileID: 0}
+  closeResultsButton: {fileID: 0}
+  resultContainer: {fileID: 0}
+  resultImagePrefab: {fileID: 0}
+  statusText: {fileID: 0}
+  categoryButtonContainer: {fileID: 0}
+  loadingPanel: {fileID: 0}
+  categoryPanel: {fileID: 0}
+  resultScrollView: {fileID: 0}
+  arDisplay: {fileID: 0}
+  useARDisplay: 1
+  settingsPanel: {fileID: 0}
+  controllerModeButton: {fileID: 0}
+  handModeButton: {fileID: 0}
+  serverUrlInput: {fileID: 0}
+  saveServerUrlButton: {fileID: 0}
+  currentInputMode: 0
+  imageUploader: {fileID: 2450632434073258816}

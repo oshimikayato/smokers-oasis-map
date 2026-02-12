@@ -1,0 +1,359 @@
+/* ==============================================
+   Smokers Oasis Map - Common Styles
+   UI Toolkit共通スタイル
+============================================== */
+
+/* ----- Variables ----- */
+:root {
+    --primary-blue: #00D9FF;
+    --primary-purple: #9933B3;
+    --primary-green: #1A8050;
+    --primary-red: #CC3333;
+    --primary-orange: #FF8833;
+    
+    --bg-dark: rgba(26, 26, 26, 0.95);
+    --bg-panel: rgba(26, 26, 51, 0.95);
+    --bg-button: rgba(51, 51, 64, 0.9);
+    --bg-button-hover: rgba(71, 71, 84, 0.95);
+    --bg-button-active: rgba(41, 41, 54, 0.95);
+    
+    --text-primary: #FFFFFF;
+    --text-secondary: #B3C0CC;
+    --text-muted: #808080;
+    
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+    
+    --transition-fast: 0.15s;
+    --transition-normal: 0.25s;
+    --transition-slow: 0.4s;
+}
+
+/* ----- Base Styles ----- */
+.panel {
+    background-color: var(--bg-panel);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+}
+
+.hidden {
+    display: none;
+}
+
+/* ----- Button Base ----- */
+.btn {
+    background-color: var(--bg-button);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    color: var(--text-primary);
+    font-size: 16px;
+    -unity-font-style: bold;
+    transition-property: background-color, scale, translate;
+    transition-duration: var(--transition-fast);
+    border-width: 0;
+}
+
+.btn:hover {
+    background-color: var(--bg-button-hover);
+    scale: 1.02;
+}
+
+.btn:active {
+    background-color: var(--bg-button-active);
+    scale: 0.98;
+}
+
+/* ----- Button Variants ----- */
+.btn-primary {
+    background-color: var(--primary-blue);
+}
+
+.btn-primary:hover {
+    background-color: #33E0FF;
+}
+
+.btn-success {
+    background-color: var(--primary-green);
+}
+
+.btn-success:hover {
+    background-color: #229966;
+}
+
+.btn-danger {
+    background-color: var(--primary-red);
+}
+
+.btn-danger:hover {
+    background-color: #DD4444;
+}
+
+.btn-purple {
+    background-color: var(--primary-purple);
+}
+
+.btn-purple:hover {
+    background-color: #AA44C4;
+}
+
+/* ----- Rounded Button (丸角ボタン) ----- */
+.btn-rounded {
+    background-color: var(--bg-button);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md) var(--spacing-xl);
+    margin: var(--spacing-sm);
+    min-height: 50px;
+    color: var(--text-primary);
+    font-size: 18px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    transition-property: background-color, scale, translate;
+    transition-duration: var(--transition-normal);
+    border-width: 0;
+}
+
+.btn-rounded:hover {
+    background-color: var(--bg-button-hover);
+    scale: 1.03;
+    translate: 0 -2px;
+}
+
+.btn-rounded:active {
+    scale: 0.97;
+    translate: 0 1px;
+}
+
+/* ----- Menu Button (メニューボタン) ----- */
+.menu-btn {
+    width: 128px;
+    height: 60px;
+    background-color: var(--bg-dark);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-sm);
+    color: var(--text-primary);
+    font-size: 14px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    transition-property: background-color, scale, translate, opacity;
+    transition-duration: var(--transition-normal);
+    border-width: 0;
+}
+
+.menu-btn:hover {
+    background-color: var(--bg-button-hover);
+    scale: 1.05;
+}
+
+.menu-btn:active {
+    scale: 0.95;
+}
+
+/* ----- Hover Menu Item (ホバーメニュー項目) ----- */
+.hover-menu-item {
+    width: 180px;
+    height: 40px;
+    background-color: var(--bg-button);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-primary);
+    font-size: 14px;
+    -unity-text-align: middle-left;
+    transition-property: background-color, scale, translate, opacity;
+    transition-duration: var(--transition-fast);
+    border-width: 0;
+    opacity: 0;
+    translate: 0 20px;
+}
+
+.hover-menu-item:hover {
+    background-color: var(--bg-button-hover);
+    scale: 1.02;
+    translate: 0 0;
+}
+
+.hover-menu-item:active {
+    background-color: var(--bg-button-active);
+    scale: 0.98;
+}
+
+/* Staggered animation classes */
+.hover-menu-item.visible {
+    opacity: 1;
+    translate: 0 0;
+}
+
+.hover-menu-item.item-0 { transition-delay: 0s; }
+.hover-menu-item.item-1 { transition-delay: 0.05s; }
+.hover-menu-item.item-2 { transition-delay: 0.1s; }
+.hover-menu-item.item-3 { transition-delay: 0.15s; }
+.hover-menu-item.item-4 { transition-delay: 0.2s; }
+.hover-menu-item.item-5 { transition-delay: 0.25s; }
+.hover-menu-item.item-6 { transition-delay: 0.3s; }
+.hover-menu-item.item-7 { transition-delay: 0.35s; }
+
+/* ----- Hover Menu Container ----- */
+.hover-menu {
+    position: absolute;
+    background-color: var(--bg-panel);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    opacity: 0;
+    scale: 0.95;
+    transition-property: opacity, scale;
+    transition-duration: var(--transition-normal);
+}
+
+.hover-menu.open {
+    opacity: 1;
+    scale: 1;
+}
+
+/* ----- Settings Panel ----- */
+.settings-panel {
+    width: 640px;
+    height: 400px;
+    background-color: var(--bg-panel);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    opacity: 0;
+    scale: 0.9;
+    transition-property: opacity, scale;
+    transition-duration: var(--transition-slow);
+}
+
+.settings-panel.open {
+    opacity: 1;
+    scale: 1;
+}
+
+.settings-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 48px;
+    margin-bottom: var(--spacing-md);
+}
+
+.settings-title {
+    color: var(--text-primary);
+    font-size: 20px;
+    -unity-font-style: bold;
+}
+
+.settings-content {
+    flex-grow: 1;
+}
+
+.settings-page {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding: var(--spacing-lg);
+    opacity: 0;
+    translate: 50px 0;
+    transition-property: opacity, translate;
+    transition-duration: var(--transition-normal);
+}
+
+.settings-page.active {
+    opacity: 1;
+    translate: 0 0;
+}
+
+.settings-page.exit-left {
+    opacity: 0;
+    translate: -50px 0;
+}
+
+.settings-footer {
+    flex-direction: row;
+    justify-content: center;
+    height: 48px;
+    margin-top: var(--spacing-md);
+}
+
+/* ----- Page Navigation ----- */
+.page-nav {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-nav-btn {
+    width: 40px;
+    height: 40px;
+    background-color: var(--bg-button);
+    border-radius: 50%;
+    font-size: 18px;
+    color: var(--text-primary);
+    -unity-text-align: middle-center;
+    transition-property: background-color, scale;
+    transition-duration: var(--transition-fast);
+    border-width: 0;
+}
+
+.page-nav-btn:hover {
+    background-color: var(--bg-button-hover);
+    scale: 1.1;
+}
+
+.page-indicator {
+    color: var(--text-secondary);
+    font-size: 16px;
+    margin: 0 var(--spacing-md);
+}
+
+/* ----- Form Elements ----- */
+.input-field {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--text-primary);
+    font-size: 14px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.2);
+    transition-property: border-color, background-color;
+    transition-duration: var(--transition-fast);
+}
+
+.input-field:focus {
+    border-color: var(--primary-blue);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ----- Toggle Button ----- */
+.toggle-on {
+    background-color: var(--primary-green);
+}
+
+.toggle-off {
+    background-color: var(--primary-red);
+}
+
+/* ----- Icon ----- */
+.icon {
+    width: 24px;
+    height: 24px;
+    margin-right: var(--spacing-sm);
+}
+
+/* ----- Label ----- */
+.label {
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.label-secondary {
+    color: var(--text-secondary);
+    font-size: 12px;
+}

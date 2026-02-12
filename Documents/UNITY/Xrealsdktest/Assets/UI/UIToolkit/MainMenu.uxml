@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="Common.uss" />
+    
+    <!-- Main Menu Container -->
+    <ui:VisualElement name="main-menu-container" style="position: absolute; bottom: 20px; left: 0; right: 0; flex-direction: row; justify-content: space-between; padding: 0 20px;">
+        
+        <!-- Settings Button (Left) -->
+        <ui:VisualElement name="settings-section" style="flex-direction: column; align-items: flex-start;">
+            <ui:Button name="settings-btn" class="menu-btn" text="⚙️ 設定" />
+            
+            <!-- Settings Hover Menu -->
+            <ui:VisualElement name="settings-hover-menu" class="hover-menu" style="bottom: 70px; left: 0;">
+                <ui:Button name="ip-settings-btn" class="hover-menu-item item-0" text="🌐 IP Settings" />
+                <ui:Button name="console-btn" class="hover-menu-item item-1" text="📋 Console" />
+                <ui:Button name="ar-mode-btn" class="hover-menu-item item-2" text="🎨 AR Mode" />
+                <ui:Button name="input-mode-btn" class="hover-menu-item item-3" text="🎮 Input Mode" />
+                <ui:Button name="beacon-btn" class="hover-menu-item item-4" text="📍 Beacon" />
+                <ui:Button name="reg-list-btn" class="hover-menu-item item-5" text="📋 Reg List" />
+                <ui:Button name="region-btn" class="hover-menu-item item-6" text="🌍 Region" />
+                <ui:Button name="tutorial-btn" class="hover-menu-item item-7" text="📖 Tutorial" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Functions Button (Right) -->
+        <ui:VisualElement name="functions-section" style="flex-direction: column; align-items: flex-end;">
+            <ui:Button name="functions-btn" class="menu-btn" text="⚡ 機能" />
+            
+            <!-- Functions Hover Menu -->
+            <ui:VisualElement name="functions-hover-menu" class="hover-menu" style="bottom: 70px; right: 0;">
+                <ui:Button name="search-btn" class="hover-menu-item item-0" text="🔍 Search" />
+                <ui:Button name="face-btn" class="hover-menu-item item-1" text="👤 Face" />
+                <ui:Button name="object-btn" class="hover-menu-item item-2" text="📦 Object" />
+                <ui:Button name="register-btn" class="hover-menu-item item-3" text="➕ Register" />
+                <ui:Button name="weather-btn" class="hover-menu-item item-4" text="🌤️ Weather" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+    </ui:VisualElement>
+    
+</ui:UXML>

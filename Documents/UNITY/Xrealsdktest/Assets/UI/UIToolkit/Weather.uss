@@ -1,0 +1,264 @@
+/* ==============================================
+   Weather Widget & Panel Styles
+============================================== */
+
+/* ----- Weather Widget (Top-Right) ----- */
+.weather-widget {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.weather-widget-inner {
+    background-color: rgba(26, 26, 51, 0.9);
+    border-radius: 12px;
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+    transition-property: scale, background-color;
+    transition-duration: 0.2s;
+}
+
+.weather-widget-inner:hover {
+    scale: 1.05;
+    background-color: rgba(36, 36, 61, 0.95);
+}
+
+.weather-emoji {
+    font-size: 32px;
+    margin-bottom: 4px;
+}
+
+.weather-temp {
+    font-size: 18px;
+    color: #FFFFFF;
+    -unity-font-style: bold;
+}
+
+.weather-area {
+    font-size: 12px;
+    color: #B3C0CC;
+    margin-top: 2px;
+}
+
+/* ----- Panel Overlay ----- */
+.panel-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+    transition-property: opacity;
+    transition-duration: 0.3s;
+}
+
+.panel-overlay.hidden {
+    display: none;
+}
+
+/* ----- Weather Panel ----- */
+.weather-panel {
+    width: 400px;
+    background-color: rgba(26, 26, 51, 0.95);
+    border-radius: 16px;
+    padding: 20px;
+    opacity: 0;
+    scale: 0.9;
+    transition-property: opacity, scale;
+    transition-duration: 0.3s;
+}
+
+.weather-panel.open {
+    opacity: 1;
+    scale: 1;
+}
+
+.weather-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.weather-title {
+    font-size: 20px;
+    color: #FFFFFF;
+    -unity-font-style: bold;
+}
+
+.close-btn {
+    width: 36px;
+    height: 36px;
+    background-color: rgba(204, 51, 51, 0.8);
+    border-radius: 18px;
+    color: #FFFFFF;
+    font-size: 18px;
+    -unity-text-align: middle-center;
+    border-width: 0;
+    transition-property: background-color, scale;
+    transition-duration: 0.15s;
+}
+
+.close-btn:hover {
+    background-color: rgba(230, 70, 70, 0.9);
+    scale: 1.1;
+}
+
+/* ----- Current Weather ----- */
+.current-weather {
+    flex-direction: row;
+    align-items: center;
+    padding: 16px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.current-emoji {
+    font-size: 48px;
+    margin-right: 16px;
+}
+
+.current-info {
+    flex-grow: 1;
+}
+
+.current-weather-text {
+    font-size: 24px;
+    color: #FFFFFF;
+    -unity-font-style: bold;
+}
+
+.current-temp {
+    font-size: 32px;
+    color: #00D9FF;
+    -unity-font-style: bold;
+}
+
+.current-area {
+    font-size: 14px;
+    color: #B3C0CC;
+    margin-top: 4px;
+}
+
+/* ----- Weather Details ----- */
+.weather-details {
+    margin-bottom: 16px;
+}
+
+.detail-row {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    margin-bottom: 4px;
+}
+
+.detail-label {
+    font-size: 14px;
+    color: #B3C0CC;
+}
+
+.detail-value {
+    font-size: 14px;
+    color: #FFFFFF;
+    -unity-font-style: bold;
+}
+
+/* ----- Forecast Section ----- */
+.forecast-section {
+    margin-bottom: 16px;
+}
+
+.forecast-title {
+    font-size: 16px;
+    color: #FFFFFF;
+    -unity-font-style: bold;
+    margin-bottom: 8px;
+}
+
+.forecast-card {
+    padding: 12px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.forecast-emoji {
+    font-size: 32px;
+    margin-right: 12px;
+}
+
+.forecast-text {
+    font-size: 16px;
+    color: #FFFFFF;
+    margin-right: 12px;
+}
+
+.forecast-temp {
+    font-size: 14px;
+    color: #00D9FF;
+    margin-right: 12px;
+}
+
+.forecast-rain {
+    font-size: 12px;
+    color: #B3C0CC;
+}
+
+/* ----- Weather Footer ----- */
+.weather-footer {
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.weather-footer .btn {
+    margin: 0 8px;
+    min-width: 120px;
+}
+
+/* ----- Region Panel ----- */
+.region-panel {
+    width: 320px;
+    background-color: rgba(26, 26, 51, 0.95);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.region-list {
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.region-btn {
+    width: 120px;
+    height: 44px;
+    margin: 4px;
+    background-color: rgba(51, 51, 64, 0.9);
+    border-radius: 8px;
+    color: #FFFFFF;
+    font-size: 14px;
+    -unity-text-align: middle-center;
+    border-width: 0;
+    transition-property: background-color, scale;
+    transition-duration: 0.15s;
+}
+
+.region-btn:hover {
+    background-color: rgba(71, 71, 84, 0.95);
+    scale: 1.02;
+}
+
+.region-btn.selected {
+    background-color: rgba(0, 217, 255, 0.3);
+    border-width: 2px;
+    border-color: #00D9FF;
+}

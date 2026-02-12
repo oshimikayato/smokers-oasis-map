@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="Common.uss" />
+    
+    <!-- Settings Panel Overlay -->
+    <ui:VisualElement name="settings-overlay" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); align-items: center; justify-content: center; display: none;">
+        
+        <!-- Settings Panel -->
+        <ui:VisualElement name="settings-panel" class="settings-panel">
+            
+            <!-- Header -->
+            <ui:VisualElement class="settings-header">
+                <ui:Label name="settings-title" class="settings-title" text="⚙️ Settings" />
+                <ui:VisualElement class="page-nav">
+                    <ui:Button name="prev-page-btn" class="page-nav-btn" text="◀" />
+                    <ui:Label name="page-indicator" class="page-indicator" text="1 / 3" />
+                    <ui:Button name="next-page-btn" class="page-nav-btn" text="▶" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+            <!-- Content Area -->
+            <ui:VisualElement name="settings-content" class="settings-content" style="position: relative;">
+                
+                <!-- Page 1: Basic Settings -->
+                <ui:VisualElement name="page-1" class="settings-page active">
+                    <!-- IP Settings Row -->
+                    <ui:VisualElement style="flex-direction: row; align-items: center; margin-bottom: 20px;">
+                        <ui:Label text="Server IP:" class="label" style="width: 100px;" />
+                        <ui:TextField name="ip-input" class="input-field" style="flex-grow: 1; margin-right: 10px;" />
+                        <ui:Button name="set-ip-btn" class="btn btn-primary" text="SET" style="width: 80px;" />
+                    </ui:VisualElement>
+                    
+                    <!-- Console Log Toggle -->
+                    <ui:Button name="console-toggle-btn" class="btn-rounded" style="background-color: #3366BB;">
+                        <ui:Label text="📋 Console Log: ON" />
+                    </ui:Button>
+                </ui:VisualElement>
+                
+                <!-- Page 2: Mode Settings -->
+                <ui:VisualElement name="page-2" class="settings-page">
+                    <!-- AR Mode Row -->
+                    <ui:VisualElement style="margin-bottom: 20px;">
+                        <ui:Label text="AR Display Mode:" class="label" style="margin-bottom: 8px;" />
+                        <ui:VisualElement style="flex-direction: row;">
+                            <ui:Button name="mode-float-btn" class="btn" text="Float" style="flex-grow: 1; margin-right: 8px;" />
+                            <ui:Button name="mode-carousel-btn" class="btn btn-purple" text="Carousel" style="flex-grow: 1; margin-right: 8px;" />
+                            <ui:Button name="mode-corridor-btn" class="btn" text="Corridor" style="flex-grow: 1;" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Input Mode Row -->
+                    <ui:VisualElement style="margin-bottom: 20px;">
+                        <ui:Label text="Input Mode:" class="label" style="margin-bottom: 8px;" />
+                        <ui:VisualElement style="flex-direction: row;">
+                            <ui:Button name="controller-btn" class="btn btn-success" text="🎮 Controller" style="flex-grow: 1; margin-right: 8px;" />
+                            <ui:Button name="hand-btn" class="btn" text="✋ Hands" style="flex-grow: 1;" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
+                    <!-- Beacon Toggle -->
+                    <ui:Button name="beacon-toggle-btn" class="btn-rounded toggle-on">
+                        <ui:Label name="beacon-label" text="📍 Beacon: ON" />
+                    </ui:Button>
+                </ui:VisualElement>
+                
+                <!-- Page 3: Additional Settings -->
+                <ui:VisualElement name="page-3" class="settings-page">
+                    <!-- Registered List Button -->
+                    <ui:Button name="reg-list-open-btn" class="btn-rounded btn-purple">
+                        <ui:Label text="📋 登録リスト" />
+                    </ui:Button>
+                    
+                    <!-- Region Settings Button -->
+                    <ui:Button name="region-open-btn" class="btn-rounded" style="background-color: #336699; margin-top: 16px;">
+                        <ui:Label text="🌍 Region Settings" />
+                    </ui:Button>
+                </ui:VisualElement>
+                
+            </ui:VisualElement>
+            
+            <!-- Footer -->
+            <ui:VisualElement class="settings-footer">
+                <ui:Button name="close-btn" class="btn btn-danger" text="✕ 閉じる" style="width: 150px;" />
+            </ui:VisualElement>
+            
+        </ui:VisualElement>
+        
+    </ui:VisualElement>
+    
+</ui:UXML>
